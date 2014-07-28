@@ -119,6 +119,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Segundos: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="sbSec"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="btPlay">
           <property name="text">
            <string>Play</string>
