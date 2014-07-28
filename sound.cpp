@@ -8,7 +8,7 @@ Sound::Sound()
 {
     sampleRate = 44100;
     nChannel = 2;
-    bitDepth = 2;
+    bitDepth = 2; 
     time = 1;
 }
 

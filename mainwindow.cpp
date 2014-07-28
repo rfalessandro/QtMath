@@ -171,6 +171,6 @@ void MainWindow::playSound()
     sound->setSampleRate(sampleRate);
     sound->setBitDepth(this->bitDepth);
     sound->setNChannel(nChannel);
-    sound->setTime(7000000);
+    sound->setTime(ui->sbSec->value() * 1000000);
     sound->play();
 }
