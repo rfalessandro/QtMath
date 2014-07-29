@@ -5,7 +5,7 @@
 #include <math.h>
 #include <sound.h>
 #include <stdlib.h>
-
+#include <QFuture>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -119,7 +119,7 @@ void MainWindow::makeGraph()
     tela->clearPy();
     for(int i=0; i < sampleRate; i++ ) {
 
-        u_int32_t x = (u_int32_t) round( sin(  i * w   * frequency ) * amplitude );
+        const u_int32_t x = (u_int32_t) round( sin(  i * w   * frequency ) * amplitude );
 
         tela->pushPy(x);
 
@@ -141,11 +141,11 @@ void MainWindow::makeGraph()
                 buffer[j++] = (char)b;
                 break;
             case 4:                
-                d = (char) ( (x >> 24  )  & 0x000000FF );//pega os 8 bits do lado fim
-                c = (char) ( (x >> 16  )  & 0x000000FF );//pega os 8 bits do meio
-                b = (char) ( (x >> 8   )  & 0x000000FF );//pega os 8 bits do lado
-                a = (char) ( (x >> 0   )  & 0x000000FF );//pega os 8bits do fim
-                //left channel
+                d = (u_int8_t) ( (x >> 24  )  & 0x000000FF );//pega os 8 bits do lado fim
+                c = (u_int8_t) ( (x >> 16  )  & 0x000000FF );//pega os 8 bits do meio
+                b = (u_int8_t) ( (x >> 8   )  & 0x000000FF );//pega os 8 bits do lado
+                a = (u_int8_t) ( (x >> 0   )  & 0x000000FF );//pega os 8bits do fim
+                //left channell
                 buffer[j++] = a;
                 buffer[j++] = b;
                 buffer[j++] = c;
@@ -172,5 +172,9 @@ void MainWindow::playSound()
     sound->setBitDepth(this->bitDepth);
     sound->setNChannel(nChannel);
     sound->setTime(ui->sbSec->value() * 1000000);
+    //QFuture<void> thread = run(sound->play());
+    //QFuture<void> thread;
+    //thread.setPaused();
+    //thread.waitForFinished();
     sound->play();
 }

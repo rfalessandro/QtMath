@@ -60,8 +60,8 @@ void Sound::setBuffer(char *buffer, int sz)
     this->szBuffer = sz;
 }
 
-int Sound::play()
-{
+void Sound::run() {
+    this->error = 0;
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
@@ -79,7 +79,8 @@ int Sound::play()
     rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
       str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
-      return -1;
+      this->error = 1;
+      return;
     }
     QString info="";
     /* Allocate a hardware parameters object. */
@@ -95,7 +96,7 @@ int Sound::play()
 
 
 
-    /* Signed 16-bit little-endian format */     
+    /* Signed 16-bit little-endian format */
     switch(this->bitDepth ) {
         case 4:
             snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
@@ -131,8 +132,8 @@ int Sound::play()
     rc = snd_pcm_hw_params(handle, params);
     if (rc < 0) {
       str.sprintf("unable to set hw parameters: %s\n", snd_strerror(rc));
-
-      return -1;
+      this->error =  -1;
+      return ;
     }
 
 
@@ -187,12 +188,16 @@ int Sound::play()
             str.sprintf("short write, write %d frames\n", rc);
         }
     }
-
-
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
-
     free(bufferToPlay);
+    this->error =  0;
+    return;
+}
+
+int Sound::play()
+{
+    this->start();
     return 0;
 }
 

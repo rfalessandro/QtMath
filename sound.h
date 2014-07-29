@@ -2,8 +2,9 @@
 #define SOUND_H
 
 #include <alsa/asoundlib.h>
+#include <QThread>
 
-class Sound
+class Sound : private QThread
 {
 private:
     int sampleRate;
@@ -12,6 +13,9 @@ private:
     long time;
     char *buffer;
     int szBuffer;
+    int error;
+protected:
+    void run();
 public:
     Sound();
 
