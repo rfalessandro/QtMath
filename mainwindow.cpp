@@ -114,16 +114,14 @@ void MainWindow::makeGraph()
         return;
     }
 
-    int j=0;
+    long j=0;
     u_int8_t a,b,c,d;
     tela->clearPy();
     for(int i=0; i < sampleRate; i++ ) {
 
         const u_int32_t x = (u_int32_t) round( sin(  i * w   * frequency ) * amplitude );
 
-        tela->pushPy(x);
-
-
+        tela->pushPy(x);     
 
         switch ( this->bitDepth) {
             case 1:
@@ -146,15 +144,15 @@ void MainWindow::makeGraph()
                 b = (u_int8_t) ( (x >> 8   )  & 0x000000FF );//pega os 8 bits do lado
                 a = (u_int8_t) ( (x >> 0   )  & 0x000000FF );//pega os 8bits do fim
                 //left channell
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
-                buffer[j++] = d;
+                buffer[j++] = (char)a;
+                buffer[j++] = (char)b;
+                buffer[j++] = (char)c;
+                buffer[j++] = (char)d;
                 //right channel
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
-                buffer[j++] = d;
+                buffer[j++] = (char)a;
+                buffer[j++] = (char)b;
+                buffer[j++] = (char)c;
+                buffer[j++] = (char)d;
                 break;
             default:
                 break;
