@@ -114,7 +114,7 @@ void MainWindow::makeGraph()
     }
 
     unsigned int j=0;
-    char a,b,c,d;
+    unsigned char a,b,c,d;
     tela->clearPy();
     for(int i=0; i < sampleRate; i++ ) {
 
@@ -128,8 +128,8 @@ void MainWindow::makeGraph()
                 buffer[j++] = (d & 0xFF);
                 break;
             case 2:
-                b = (char) ( (x >> 8 ) &  0xFF);//pega os 8 bits do lado
-                a = (char) ( (x >> 0 ) &  0xFF);//pega os 8bits do fim
+                b = (unsigned char) ( (x >> 8 ) &  0xFF);//pega os 8 bits do lado
+                a = (unsigned char) ( (x >> 0 ) &  0xFF);//pega os 8bits do fim
                 //left channel
                 buffer[j++] = a;
                 buffer[j++] = b;
@@ -138,10 +138,10 @@ void MainWindow::makeGraph()
                 buffer[j++] = b;
                 break;
             case 4:                
-                d = (char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
-                c = (char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
-                b = (char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
-                a = (char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
+                d = (unsigned char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
+                c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
+                b = (unsigned char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
+                a = (unsigned char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
                 //left channell
                 buffer[j++] = a;
                 buffer[j++] = b;
