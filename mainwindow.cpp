@@ -106,59 +106,59 @@ void MainWindow::makeGraph()
     if(buffer != NULL) {
         free(buffer);
     }
-    buffer = (char*) malloc ( sizeof(char) *  szBuffer);
-    memset(buffer, 0, szBuffer);
+    buffer = (char *) calloc ( sizeof(char) , szBuffer);
 
     if(buffer == NULL || buffer == 0) {
        //errorr
         return;
     }
 
-    long j=0;
-    u_int8_t a,b,c,d;
+    unsigned int j=0;
+    char a,b,c,d;
     tela->clearPy();
     for(int i=0; i < sampleRate; i++ ) {
 
-        const u_int32_t x = (u_int32_t) round( sin(  i * w   * frequency ) * amplitude );
+        int x =  round(sin(  i * w   * frequency ) * amplitude );
 
-        tela->pushPy(x);     
+        tela->pushPy(x);
 
         switch ( this->bitDepth) {
             case 1:
-                buffer[j++] = (char)d;
-                buffer[j++] = (char)d;
+                buffer[j++] = (d & 0xFF);
+                buffer[j++] = (d & 0xFF);
                 break;
             case 2:
-                b = (u_int8_t) ( (x >> 8 ) &  0x000000FF);//pega os 8 bits do lado
-                a = (u_int8_t) ( (x >> 0 ) &  0x000000FF);//pega os 8bits do fim
+                b = (char) ( (x >> 8 ) &  0xFF);//pega os 8 bits do lado
+                a = (char) ( (x >> 0 ) &  0xFF);//pega os 8bits do fim
                 //left channel
-                buffer[j++] = (char)a;
-                buffer[j++] = (char)b;
+                buffer[j++] = a;
+                buffer[j++] = b;
                 //right channel
-                buffer[j++] = (char)a;
-                buffer[j++] = (char)b;
+                buffer[j++] = a;
+                buffer[j++] = b;
                 break;
             case 4:                
-                d = (u_int8_t) ( (x >> 24  )  & 0x000000FF );//pega os 8 bits do lado fim
-                c = (u_int8_t) ( (x >> 16  )  & 0x000000FF );//pega os 8 bits do meio
-                b = (u_int8_t) ( (x >> 8   )  & 0x000000FF );//pega os 8 bits do lado
-                a = (u_int8_t) ( (x >> 0   )  & 0x000000FF );//pega os 8bits do fim
+                d = (char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
+                c = (char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
+                b = (char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
+                a = (char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
                 //left channell
-                buffer[j++] = (char)a;
-                buffer[j++] = (char)b;
-                buffer[j++] = (char)c;
-                buffer[j++] = (char)d;
+                buffer[j++] = a;
+                buffer[j++] = b;
+                buffer[j++] = c;
+                buffer[j++] = d;
                 //right channel
-                buffer[j++] = (char)a;
-                buffer[j++] = (char)b;
-                buffer[j++] = (char)c;
-                buffer[j++] = (char)d;
+                buffer[j++] = a;
+                buffer[j++] = b;
+                buffer[j++] = c;
+                buffer[j++] = d;
+
+                //printf("[ %d ] [%d] { %d }  %x \n",i,j,szBuffer, x  );
                 break;
             default:
                 break;
         }
     }
-
     tela->repaint();
 
 }
