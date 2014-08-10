@@ -37,6 +37,7 @@ private slots:
     void playSound();
     void makeGraph();
     void updateFrame();
+    void soundStatus();
 };
 
 

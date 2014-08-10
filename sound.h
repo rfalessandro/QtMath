@@ -4,7 +4,7 @@
 #include <alsa/asoundlib.h>
 #include <QThread>
 
-class Sound : private QThread
+class Sound : public QObject
 {
 private:
     int sampleRate;
@@ -14,6 +14,8 @@ private:
     char *buffer;
     int szBuffer;
     int error;
+    bool playing;
+    QThread *thread;
 protected:
     void run();
 public:
@@ -30,9 +32,14 @@ public:
     void setBuffer(char *buffer, int szBuffer);
 
     long getTime();
-    int play();
-    int pause();
-    int stop();
+    void play();
+    void pause();
+    void stop();
+    bool isPlaying();
+
+signals:
+    Q_SLOT void stopSound();
+    Q_SLOT void startSound();
 
 
 };

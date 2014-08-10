@@ -10,6 +10,8 @@ Sound::Sound()
     nChannel = 2;
     bitDepth = 2; 
     time = 1;
+    thread = new QThread;
+    this->moveToThread(thread);
 }
 
 
@@ -61,6 +63,8 @@ void Sound::setBuffer(char *buffer, int sz)
 }
 
 void Sound::run() {
+    playing = true;
+    emit startSound();
     this->error = 0;
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
@@ -80,7 +84,9 @@ void Sound::run() {
     if (rc < 0) {
       str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
       this->error = 1;
+      stop();
       return;
+
     }
     QString info="";
     /* Allocate a hardware parameters object. */
@@ -133,6 +139,7 @@ void Sound::run() {
     if (rc < 0) {
       str.sprintf("unable to set hw parameters: %s\n", snd_strerror(rc));
       this->error =  -1;
+      stop();
       return ;
     }
 
@@ -161,7 +168,7 @@ void Sound::run() {
     int i=0;
 
 
-    while (loops > 0) {
+    while (loops > 0 && playing) {
         loops--;
         memcpy(bufferToPlay, buffer+rc, size);
 
@@ -192,22 +199,32 @@ void Sound::run() {
     snd_pcm_close(handle);
     free(bufferToPlay);
     this->error =  0;
+    stop();
     return;
 }
 
-int Sound::play()
+
+
+void Sound::play()
 {
-    this->start();
-    return 0;
+
+    thread->start();
+    run();
 }
 
-int Sound::stop()
+void Sound::stop()
 {
-    return 0;
+    playing = false;
+    emit stopSound();
 }
 
-int Sound::pause()
+bool Sound::isPlaying()
 {
-    return 0;
+    return playing;
+}
+
+void Sound::pause()
+{
+    return ;
 }
 

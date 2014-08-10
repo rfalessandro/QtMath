@@ -13,14 +13,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     tela = new FramePainter;
     ui->vlFrame->addWidget((QWidget *)this->tela);
-
-
+    tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
+    tela->setLineColor(QColor(0x67, 0x95, 0x94));
+    tela->setGraphLineColor(QColor(0x67, 0x95, 0x94));
+    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7));
 
 
 
     ui->cbDepth->addItem(" 8 Bits ",  1);
     ui->cbDepth->addItem(" 16 Bits ", 2);
-   // ui->cbDepth->addItem(" 24 Bits ", 3);
+    ui->cbDepth->addItem(" 24 Bits ", 3);
     ui->cbDepth->addItem(" 32 Bits ", 4);
 
     ui->cbDepth->setCurrentIndex(1);
@@ -41,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     sound = new Sound;
-
+    connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
+    connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
 
     this->nChannel = 2;
 //    this->bitDepth = 2;
@@ -137,6 +140,19 @@ void MainWindow::makeGraph()
                 buffer[j++] = a;
                 buffer[j++] = b;
                 break;
+            case 3:
+                c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
+                b = (unsigned char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
+                a = (unsigned char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
+                //left channell
+                buffer[j++] = a;
+                buffer[j++] = b;
+                buffer[j++] = c;
+                //right channel
+                buffer[j++] = a;
+                buffer[j++] = b;
+                buffer[j++] = c;
+                //printf("[ %d ] [%d] { %d }  %x \n",i,j,szBuffer, x  );
             case 4:                
                 d = (unsigned char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
                 c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
@@ -152,7 +168,6 @@ void MainWindow::makeGraph()
                 buffer[j++] = b;
                 buffer[j++] = c;
                 buffer[j++] = d;
-
                 //printf("[ %d ] [%d] { %d }  %x \n",i,j,szBuffer, x  );
                 break;
             default:
@@ -160,7 +175,6 @@ void MainWindow::makeGraph()
         }
     }
     tela->repaint();
-
 }
 
 void MainWindow::playSound()
@@ -170,9 +184,14 @@ void MainWindow::playSound()
     sound->setBitDepth(this->bitDepth);
     sound->setNChannel(nChannel);
     sound->setTime(ui->sbSec->value() * 1000000);
-    //QFuture<void> thread = run(sound->play());
-    //QFuture<void> thread;
-    //thread.setPaused();
-    //thread.waitForFinished();
     sound->play();
+}
+
+void MainWindow::soundStatus()
+{
+    if(sound->isPlaying()) {
+        ui->btPlay->setText("Stop");
+    }else {
+        ui->btPlay->setText("Play");
+    }
 }
