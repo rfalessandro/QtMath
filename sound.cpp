@@ -10,8 +10,7 @@ Sound::Sound()
     nChannel = 2;
     bitDepth = 2; 
     time = 1;
-    thread = new QThread;
-    this->moveToThread(thread);
+
 }
 
 
@@ -34,6 +33,8 @@ void Sound::setTime(long time)
 {
     this->time = time;
 }
+
+
 
 int Sound::getBitDepth()
 {
@@ -207,15 +208,15 @@ void Sound::run() {
 
 void Sound::play()
 {
-
-    thread->start();
     run();
 }
 
 void Sound::stop()
 {
-    playing = false;
-    emit stopSound();
+    if(playing) {
+        playing = false;
+        emit stopSound();
+    }
 }
 
 bool Sound::isPlaying()
@@ -228,3 +229,7 @@ void Sound::pause()
     return ;
 }
 
+void Sound::process()
+{
+  run();
+}

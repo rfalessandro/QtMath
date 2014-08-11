@@ -2,10 +2,14 @@
 #define SOUND_H
 
 #include <alsa/asoundlib.h>
-#include <QThread>
+#include <QObject>
 
 class Sound : public QObject
 {
+    Q_OBJECT
+protected:
+    void run();
+
 private:
     int sampleRate;
     int bitDepth;
@@ -15,12 +19,8 @@ private:
     int szBuffer;
     int error;
     bool playing;
-    QThread *thread;
-protected:
-    void run();
 public:
-    Sound();
-
+    Sound();    
     void setTime(long time);
     void setSampleRate(int sampleRate);
     void setBitDepth(int depth);
@@ -37,9 +37,11 @@ public:
     void stop();
     bool isPlaying();
 
+public slots:
+    void process() ;
 signals:
-    Q_SLOT void stopSound();
-    Q_SLOT void startSound();
+    void stopSound();
+    void startSound();
 
 
 };

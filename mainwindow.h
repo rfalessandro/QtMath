@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <framepainter.h>
 #include <sound.h>
+#include <QThread>
+
 
 namespace Ui {
 class MainWindow;
@@ -23,7 +25,7 @@ public:
 private:
     Ui::MainWindow *ui;
     FramePainter *tela;
-
+    QThread *t;
     Sound *sound;
     char *buffer;
     int szBuffer;

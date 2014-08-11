@@ -46,6 +46,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
 
+    t = new QThread;
+
+    sound->moveToThread(t);
+
+    connect(t, SIGNAL(started()), sound, SLOT(process()));
+
+
+    t->start();
+
+
     this->nChannel = 2;
 //    this->bitDepth = 2;
 
@@ -179,12 +189,23 @@ void MainWindow::makeGraph()
 
 void MainWindow::playSound()
 {
-    sound->setBuffer(buffer, szBuffer);
-    sound->setSampleRate(sampleRate);
-    sound->setBitDepth(this->bitDepth);
-    sound->setNChannel(nChannel);
-    sound->setTime(ui->sbSec->value() * 1000000);
-    sound->play();
+    if(sound->isPlaying()) {
+        sound->stop();
+
+
+    }else {
+        sound->setBuffer(buffer, szBuffer);
+        sound->setSampleRate(sampleRate);
+        sound->setBitDepth(this->bitDepth);
+        sound->setNChannel(nChannel);
+        sound->setTime(ui->sbSec->value() * 1000000);
+//        sound->play();
+        t->quit();
+        t->start();
+
+
+
+    }
 }
 
 void MainWindow::soundStatus()
@@ -192,6 +213,7 @@ void MainWindow::soundStatus()
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");
     }else {
+        t->exit();
         ui->btPlay->setText("Play");
     }
 }
