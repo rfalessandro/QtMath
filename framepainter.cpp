@@ -195,7 +195,6 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
         j++;
     }
 
-
     poly << QPoint( std::min(rect->width(), i) , middle);
     QPainterPath path;
     path.addPolygon(poly);

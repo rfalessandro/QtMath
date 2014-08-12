@@ -6,6 +6,8 @@
 #include <sound.h>
 #include <stdlib.h>
 #include <QFuture>
+#include <mathutil.h>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -63,6 +65,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     updateMain();
     makeGraph();
+
+
+    new MathUtil();
 }
 
 
@@ -121,8 +126,7 @@ void MainWindow::makeGraph()
     }
     buffer = (char *) calloc ( sizeof(char) , szBuffer);
 
-    if(buffer == NULL || buffer == 0) {
-       //errorr
+    if(buffer == NULL || buffer == 0) {       
         return;
     }
 
@@ -162,7 +166,6 @@ void MainWindow::makeGraph()
                 buffer[j++] = a;
                 buffer[j++] = b;
                 buffer[j++] = c;
-                //printf("[ %d ] [%d] { %d }  %x \n",i,j,szBuffer, x  );
             case 4:                
                 d = (unsigned char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
                 c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
@@ -178,7 +181,6 @@ void MainWindow::makeGraph()
                 buffer[j++] = b;
                 buffer[j++] = c;
                 buffer[j++] = d;
-                //printf("[ %d ] [%d] { %d }  %x \n",i,j,szBuffer, x  );
                 break;
             default:
                 break;
@@ -191,29 +193,30 @@ void MainWindow::playSound()
 {
     if(sound->isPlaying()) {
         sound->stop();
-
-
     }else {
         sound->setBuffer(buffer, szBuffer);
         sound->setSampleRate(sampleRate);
         sound->setBitDepth(this->bitDepth);
         sound->setNChannel(nChannel);
         sound->setTime(ui->sbSec->value() * 1000000);
-//        sound->play();
         t->quit();
         t->start();
-
-
-
     }
 }
 
 void MainWindow::soundStatus()
 {
+    bool block;
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");
+        block = true;
     }else {
         t->exit();
         ui->btPlay->setText("Play");
+        block = false;
     }
+    ui->cbDepth->setDisabled(block);
+    ui->sbAmp->setDisabled(block);
+    ui->sbFreq->setDisabled(block);
+    ui->sbSec->setDisabled(block);
 }
