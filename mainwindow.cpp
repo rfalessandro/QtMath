@@ -5,6 +5,7 @@
 #include <math.h>
 #include <sound.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <QFuture>
 #include <mathutil.h>
 
@@ -131,7 +132,7 @@ void MainWindow::makeGraph()
     }
 
     unsigned int j=0;
-    unsigned char a,b,c,d;
+    unsigned char *aux;
     tela->clearPy();
     for(int i=0; i < sampleRate; i++ ) {
 
@@ -141,49 +142,40 @@ void MainWindow::makeGraph()
 
         switch ( this->bitDepth) {
             case 1:
-                buffer[j++] = (d & 0xFF);
-                buffer[j++] = (d & 0xFF);
+                aux = MathUtil::to8Le(x);
+                memcpy( (buffer+j), aux, 1);
+                memcpy( (buffer+j + 1), aux, 1);
+                //memccpy(buffer+j, aux,1,this->nChannel);
+                j += (1 * this->nChannel);
                 break;
             case 2:
-                b = (unsigned char) ( (x >> 8 ) &  0xFF);//pega os 8 bits do lado
-                a = (unsigned char) ( (x >> 0 ) &  0xFF);//pega os 8bits do fim
-                //left channel
-                buffer[j++] = a;
-                buffer[j++] = b;
-                //right channel
-                buffer[j++] = a;
-                buffer[j++] = b;
+                aux = MathUtil::to16Le(x);
+                //memccpy(buffer+j, aux,2,this->nChannel);
+                memcpy( (buffer+j), aux, 2);
+                memcpy( (buffer+j + 2), aux, 2);
+
+
+                j += ( 2 * this->nChannel);
                 break;
             case 3:
-                c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
-                b = (unsigned char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
-                a = (unsigned char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
-                //left channell
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
-                //right channel
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
+                aux = MathUtil::to24Le(x);
+                //memccpy(buffer+j, aux,3,this->nChannel);
+                memcpy( (buffer+j), aux, 3);
+                memcpy( (buffer+ j + 3), aux, 3);
+
+                j += (3 * this->nChannel);
             case 4:                
-                d = (unsigned char) ( (x >> 24  )  & 0xFF );//pega os 8 bits do lado fim
-                c = (unsigned char) ( (x >> 16  )  & 0xFF );//pega os 8 bits do meio
-                b = (unsigned char) ( (x >> 8   )  & 0xFF );//pega os 8 bits do lado
-                a = (unsigned char) ( (x >> 0   )  & 0xFF );//pega os 8bits do fim
-                //left channell
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
-                buffer[j++] = d;
-                //right channel
-                buffer[j++] = a;
-                buffer[j++] = b;
-                buffer[j++] = c;
-                buffer[j++] = d;
+                aux = MathUtil::to32Le(x);
+                //memccpy(buffer+j, aux,4,this->nChannel);
+                memcpy( (buffer+j), aux, 4);
+                memcpy( (buffer+j + 4), aux, 4);
+                j += (4 * this->nChannel);
                 break;
             default:
                 break;
+        }
+        if(aux != NULL)  {
+            free(aux);
         }
     }
     tela->repaint();

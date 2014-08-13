@@ -1,16 +1,16 @@
 #include "mathutil.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 MathUtil::MathUtil()
 {
-    int a = 65000;
-    printf(" %x [] %x [] %d  ", a, (to32Le((uint)a))[4], (int)to32Le(to32Le((uint)a), 0) );
+
 }
 
 unsigned char *MathUtil::to32Le(uint value)
 {
     unsigned char *buffer;
-    buffer = (unsigned char *)malloc(sizeof(unsigned char) * 4);
+    buffer = (unsigned char *)calloc(sizeof(unsigned char),  4);
+
     unsigned char d = (unsigned char) ( (value >> 24  )  & 0xFF );//pega os 8 bits do lado fim
     unsigned char c = (unsigned char) ( (value >> 16  )  & 0xFF );//pega os 8 bits do meio
     unsigned char b = (unsigned char) ( (value >> 8   )  & 0xFF );//pega os 8 bits do lado
@@ -26,7 +26,7 @@ unsigned char *MathUtil::to32Le(uint value)
 unsigned char *MathUtil::to24Le(uint value)
 {
     unsigned char *buffer;
-    buffer = (unsigned char *)malloc(sizeof(unsigned char) * 3);
+    buffer = (unsigned char *)calloc(sizeof(unsigned char),  3);
     unsigned char c = (unsigned char) ( (value >> 16  )  & 0xFF );//pega os 8 bits do meio
     unsigned char b = (unsigned char) ( (value >> 8   )  & 0xFF );//pega os 8 bits do lado
     unsigned char a = (unsigned char) ( (value >> 0   )  & 0xFF );//pega os 8bits do fim
@@ -40,7 +40,7 @@ unsigned char *MathUtil::to24Le(uint value)
 unsigned char *MathUtil::to16Le(uint value)
 {
     unsigned char *buffer;
-    buffer = (unsigned char *)malloc(sizeof(unsigned char) * 2);
+    buffer = (unsigned char *)calloc(sizeof(unsigned char),  2);
     unsigned char b = (unsigned char) ( (value >> 8   )  & 0xFF );//pega os 8 bits do lado
     unsigned char a = (unsigned char) ( (value >> 0   )  & 0xFF );//pega os 8bits do fim
     buffer[0] = a;
@@ -53,7 +53,7 @@ unsigned char *MathUtil::to16Le(uint value)
 unsigned char *MathUtil::to8Le(uint value)
 {
     unsigned char *buffer;
-    buffer = (unsigned char *)malloc(sizeof(unsigned char) * 1);
+    buffer = (unsigned char *)calloc(sizeof(unsigned char),  1);
     unsigned char a = (unsigned char) ( (value >> 0   )  & 0xFF );//pega os 8bits do fim
     buffer[0] = a;
     return buffer;
@@ -63,8 +63,9 @@ unsigned char *MathUtil::to8Le(uint value)
 int32_t MathUtil::to32Le(const unsigned char *arr, int pos)
 {
     if(arr != NULL) {
-        return ( (  (0x000000FF & arr[pos + 0])  << 0) | (  (0x000000FF & arr[pos + 1]) << 8  ) |
-                (  (0x000000FF & arr[pos + 2]) << 16 ) | (  (0x000000FF & arr[pos + 4]) << 24 ) );
+        unsigned int ret = ( (  (0x000000FF & arr[pos + 0])  << 0) | (  (0x000000FF & arr[pos + 1]) << 8  ) |
+                (  (0x000000FF & arr[pos + 2]) << 16 ) | (  (0x000000FF & arr[pos + 3]) << 24 ) );
+        return (int32_t)ret;
     }
     return 0;
 }

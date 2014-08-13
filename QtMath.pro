@@ -16,10 +16,12 @@ LIBS += -lasound
 SOURCES += main.cpp\
         mainwindow.cpp \
     framepainter.cpp \
-    sound.cpp
+    sound.cpp \
+    mathutil.cpp
 
 HEADERS  += mainwindow.h \
     framepainter.h \
-    sound.h
+    sound.h \
+    mathutil.h
 
 FORMS    += mainwindow.ui
