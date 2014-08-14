@@ -27,7 +27,7 @@ private:
     FramePainter *tela;
     QThread *t;
     Sound *sound;
-    char *buffer;
+    unsigned char *buffer;
     int szBuffer;
     int sampleRate;
     int nChannel;

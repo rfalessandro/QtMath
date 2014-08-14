@@ -15,7 +15,7 @@ private:
     int bitDepth;
     int nChannel;
     long time;
-    char *buffer;
+    unsigned const char *buffer;
     int szBuffer;
     int error;
     bool playing;
@@ -29,7 +29,7 @@ public:
     int getBitDepth();
     int getNChannel();
 
-    void setBuffer(char *buffer, int szBuffer);
+    void setBuffer(unsigned const char *buffer, int szBuffer);
 
     long getTime();
     void play();

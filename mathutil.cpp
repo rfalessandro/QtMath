@@ -1,6 +1,6 @@
 #include "mathutil.h"
-
 #include <stdlib.h>
+
 MathUtil::MathUtil()
 {
 
@@ -63,9 +63,8 @@ unsigned char *MathUtil::to8Le(uint value)
 int32_t MathUtil::to32Le(const unsigned char *arr, int pos)
 {
     if(arr != NULL) {
-        unsigned int ret = ( (  (0x000000FF & arr[pos + 0])  << 0) | (  (0x000000FF & arr[pos + 1]) << 8  ) |
+        return ( (  (0x000000FF & arr[pos + 0])  << 0) | (  (0x000000FF & arr[pos + 1]) << 8  ) |
                 (  (0x000000FF & arr[pos + 2]) << 16 ) | (  (0x000000FF & arr[pos + 3]) << 24 ) );
-        return (int32_t)ret;
     }
     return 0;
 }

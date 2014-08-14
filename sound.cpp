@@ -57,7 +57,7 @@ long Sound::getTime()
 }
 
 
-void Sound::setBuffer(char *buffer, int sz)
+void Sound::setBuffer(unsigned const char *buffer, int sz)
 {
     this->buffer = buffer;
     this->szBuffer = sz;

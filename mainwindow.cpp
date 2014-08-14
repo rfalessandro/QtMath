@@ -125,7 +125,7 @@ void MainWindow::makeGraph()
     if(buffer != NULL) {
         free(buffer);
     }
-    buffer = (char *) calloc ( sizeof(char) , szBuffer);
+    buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
 
     if(buffer == NULL || buffer == 0) {       
         return;
@@ -143,41 +143,33 @@ void MainWindow::makeGraph()
         switch ( this->bitDepth) {
             case 1:
                 aux = MathUtil::to8Le(x);
-                memcpy( (buffer+j), aux, 1);
-                memcpy( (buffer+j + 1), aux, 1);
-                //memccpy(buffer+j, aux,1,this->nChannel);
-                j += (1 * this->nChannel);
                 break;
             case 2:
                 aux = MathUtil::to16Le(x);
-                //memccpy(buffer+j, aux,2,this->nChannel);
-                memcpy( (buffer+j), aux, 2);
-                memcpy( (buffer+j + 2), aux, 2);
-
-
-                j += ( 2 * this->nChannel);
                 break;
             case 3:
                 aux = MathUtil::to24Le(x);
-                //memccpy(buffer+j, aux,3,this->nChannel);
-                memcpy( (buffer+j), aux, 3);
-                memcpy( (buffer+ j + 3), aux, 3);
-
-                j += (3 * this->nChannel);
+                break;
             case 4:                
                 aux = MathUtil::to32Le(x);
-                //memccpy(buffer+j, aux,4,this->nChannel);
-                memcpy( (buffer+j), aux, 4);
-                memcpy( (buffer+j + 4), aux, 4);
-                j += (4 * this->nChannel);
                 break;
             default:
                 break;
         }
+
+        for(int w=0; w < this->nChannel ; w++) {
+            memcpy(buffer+j, aux, this->bitDepth);
+            j += this->bitDepth;
+        }
+
+
+
         if(aux != NULL)  {
             free(aux);
         }
+
     }
+
     tela->repaint();
 }
 
