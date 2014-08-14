@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QPoint>
 #include <QApplication>
+#include <mathutil.h>
 
 FramePainter::FramePainter(QWidget *parent) :
     QWidget(parent)
@@ -20,18 +21,17 @@ FramePainter::FramePainter(QWidget *parent) :
     dy = 0;
     zoom = 1;
 
-
+    szBuffer = 0;
 
 }
 
 
-void FramePainter::pushPy(int value)
+void FramePainter::setBuffer(unsigned const char *buffer, int szBuffer, int bitDepth, int nChannel)
 {
-    this->pyList.push_back(value);
-}
-void FramePainter::clearPy()
-{
-    this->pyList.clear();
+    this->nChannel = nChannel;
+    this->bitDepth = bitDepth;
+    this->szBuffer = szBuffer;
+    this->buffer = buffer;
 }
 
 
@@ -184,15 +184,43 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
     int middle = rect->height()/2. + dy;
     QPolygon poly;
     poly << QPoint(0, middle);
-    int j = dx;
+
+
+    int j = dx * (this->nChannel * this->bitDepth) ;
 
     int i;
-    for( i = 0; i < rect->width() + zoom && j < pyList.length() ; i += zoom ) {
-        int p = middle - pyList.at(j) * zoom;
+    //for( i = 0; i < rect->width() + zoom && j < pyList.length() ; i += zoom ) {
+    for( i = 0; i < rect->width() + zoom  && j < szBuffer ; i += zoom ) {
+
+        //int p = middle - pyList.at(j)  * zoom;
+        int value = 0;
+        switch ( this->bitDepth) {
+            case 1:
+                value = MathUtil::to8Le(buffer, j);
+                break;
+            case 2:
+                value = MathUtil::to16Le(buffer, j);
+                break;
+            case 3:
+                value = MathUtil::to24Le(buffer, j);
+                break;
+            case 4:
+                value = MathUtil::to32Le(buffer, j);
+                break;
+            default:
+                break;
+        }
+
+
+
+        int p = middle - value;
+
         paint->fillRect(i-2, p-2, 4, 4,  graphLineColor);
         paint->drawEllipse(i-3, p-3, 5, 5 );
         poly << QPoint(i,p);
-        j++;
+
+
+        j += (this->nChannel * this->bitDepth);
     }
 
     poly << QPoint( std::min(rect->width(), i) , middle);

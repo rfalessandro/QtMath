@@ -133,12 +133,12 @@ void MainWindow::makeGraph()
 
     unsigned int j=0;
     unsigned char *aux;
-    tela->clearPy();
+
     for(int i=0; i < sampleRate; i++ ) {
 
         int x =  round(sin(  i * w   * frequency ) * amplitude );
 
-        tela->pushPy(x);
+
 
         switch ( this->bitDepth) {
             case 1:
@@ -161,14 +161,13 @@ void MainWindow::makeGraph()
             memcpy(buffer+j, aux, this->bitDepth);
             j += this->bitDepth;
         }
-
-
-
         if(aux != NULL)  {
             free(aux);
         }
-
     }
+
+
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
 
     tela->repaint();
 }

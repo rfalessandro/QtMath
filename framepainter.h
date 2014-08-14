@@ -13,7 +13,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *evt);
     void wheelEvent(QWheelEvent *evt);
 private:
-    QList<int> pyList;
+    unsigned const char *buffer;
     QColor backgroundColor;
     QColor lineColor;
     QColor graphBackgroundColor;
@@ -21,6 +21,11 @@ private:
     int dy;
     int dx;
     int zoom;
+
+    int bitDepth;
+    int nChannel;
+    int szBuffer;
+
 
     void drawGraph(QPainter *paint, QRect *rect);
     void drawBackground(QPainter *paint, QRect *rect);
@@ -38,9 +43,8 @@ public:
     QColor getGraphBackgroundColor();
     QColor getGraphLineColor();
 
+    void setBuffer(unsigned const char *buffer, int szBuffer, int bitDepth, int nChannel);
 
-    void pushPy(int value);
-    void clearPy();
     void setDy(int dy);
     void setDx(int dx);
     void setZoom(int zoom);
