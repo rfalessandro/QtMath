@@ -28,7 +28,7 @@ private:
     QThread *t;
     Sound *sound;
     unsigned char *buffer;
-    int szBuffer;
+    unsigned int szBuffer;
     int sampleRate;
     int nChannel;
     int bitDepth;
@@ -40,6 +40,7 @@ private slots:
     void makeGraph();
     void updateFrame();
     void soundStatus();
+    void soundProgess(unsigned int value, double sec);
 };
 
 

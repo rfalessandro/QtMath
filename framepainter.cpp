@@ -26,7 +26,7 @@ FramePainter::FramePainter(QWidget *parent) :
 }
 
 
-void FramePainter::setBuffer(unsigned const char *buffer, int szBuffer, int bitDepth, int nChannel)
+void FramePainter::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel)
 {
     this->nChannel = nChannel;
     this->bitDepth = bitDepth;
@@ -102,7 +102,9 @@ void FramePainter::setDy(int dy)
 {
     if(this->dy != dy) {
         this->dy = dy;
+        emit valueChanged();
         repaint();
+
     }
 
 }
@@ -111,6 +113,7 @@ void FramePainter::setDx(int dx)
 {
     if(this->dx != dx) {
         this->dx = dx;
+        emit valueChanged();
         repaint();
     }
 }
@@ -119,6 +122,7 @@ void FramePainter::setZoom(int zoom)
 {
     if(this->zoom != zoom) {
         this->zoom = zoom;
+        emit valueChanged();
         repaint();
     }
 }
@@ -180,16 +184,15 @@ void FramePainter::drawBackground(QPainter *paint, QRect *rect)
 
 void FramePainter::drawGraph(QPainter *paint, QRect *rect)
 {
-    paint->setPen(graphLineColor);
+
     int middle = rect->height()/2. + dy;
     QPolygon poly;
     poly << QPoint(0, middle);
 
 
-    int j = dx * (this->nChannel * this->bitDepth) ;
+    unsigned int j = dx * (this->nChannel * this->bitDepth) ;
 
     int i;
-    //for( i = 0; i < rect->width() + zoom && j < pyList.length() ; i += zoom ) {
     for( i = 0; i < rect->width() + zoom  && j < szBuffer ; i += zoom ) {
 
         //int p = middle - pyList.at(j)  * zoom;
@@ -210,19 +213,14 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
             default:
                 break;
         }
-
-
-
+        value = value * zoom;
         int p = middle - value;
-
-        paint->fillRect(i-2, p-2, 4, 4,  graphLineColor);
-        paint->drawEllipse(i-3, p-3, 5, 5 );
+        paint->setBrush(graphLineColor);
+        paint->drawEllipse(i-2, p-2, 4, 4 );
         poly << QPoint(i,p);
-
-
         j += (this->nChannel * this->bitDepth);
     }
-
+    paint->setBrush(graphBackgroundColor);
     poly << QPoint( std::min(rect->width(), i) , middle);
     QPainterPath path;
     path.addPolygon(poly);

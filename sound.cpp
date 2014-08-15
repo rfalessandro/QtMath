@@ -57,7 +57,7 @@ long Sound::getTime()
 }
 
 
-void Sound::setBuffer(unsigned const char *buffer, int sz)
+void Sound::setBuffer(unsigned const char *buffer, unsigned int sz)
 {
     this->buffer = buffer;
     this->szBuffer = sz;
@@ -78,7 +78,7 @@ void Sound::run() {
     int dir;
     char *bufferToPlay;
     QString str = "";
-
+    unsigned int desloc;
 
     /* Open PCM device for playback. */
     rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
@@ -166,25 +166,15 @@ void Sound::run() {
 
 
     loops = this->time / val2;
-    int i=0;
-
-
     while (loops > 0 && playing) {
         loops--;
-        memcpy(bufferToPlay, buffer+rc, size);
+        memcpy(bufferToPlay, buffer+desloc, size);
 
-        rc += size;
-        if(rc > szBuffer ) {
-            rc = 0;
+        desloc += size;
+        if(desloc > szBuffer ) {
+            desloc = 0;//circular
         }
-        i += rc;
 
-        if (rc == 0) {
-            str.sprintf("end of file on input\n");
-            break;
-        } else if (rc != size) {
-            str.sprintf("short read: read %d bytes\n", rc);
-        }
         rc = snd_pcm_writei(handle, bufferToPlay, frames);
         if (rc == -EPIPE) {
             /* EPIPE means underrun */
@@ -195,6 +185,7 @@ void Sound::run() {
         }  else if (rc != (int)frames) {
             str.sprintf("short write, write %d frames\n", rc);
         }
+        emit progress(desloc, (((double)val2) * (double)loops)/1000000.0);
     }
     snd_pcm_drain(handle);
     snd_pcm_close(handle);

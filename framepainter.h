@@ -24,7 +24,7 @@ private:
 
     int bitDepth;
     int nChannel;
-    int szBuffer;
+    unsigned int szBuffer;
 
 
     void drawGraph(QPainter *paint, QRect *rect);
@@ -43,7 +43,7 @@ public:
     QColor getGraphBackgroundColor();
     QColor getGraphLineColor();
 
-    void setBuffer(unsigned const char *buffer, int szBuffer, int bitDepth, int nChannel);
+    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel);
 
     void setDy(int dy);
     void setDx(int dx);

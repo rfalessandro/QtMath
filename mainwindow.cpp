@@ -17,9 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
     tela = new FramePainter;
     ui->vlFrame->addWidget((QWidget *)this->tela);
     tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
-    tela->setLineColor(QColor(0x67, 0x95, 0x94));
-    tela->setGraphLineColor(QColor(0x67, 0x95, 0x94));
-    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7));
+    tela->setLineColor(QColor(0x67, 0x95, 0x94, 0x70));
+    tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
+    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 70));
 
 
 
@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sound = new Sound;
     connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
-
+    connect(this->sound, SIGNAL(progress(unsigned int, double)), this, SLOT(soundProgess(unsigned int, double)));
     t = new QThread;
 
     sound->moveToThread(t);
@@ -77,6 +77,7 @@ MainWindow::~MainWindow()
     if(buffer != NULL) {
         free(buffer);
     }
+    t->exit();
     delete sound;
     delete tela;
     delete ui;
@@ -136,7 +137,7 @@ void MainWindow::makeGraph()
 
     for(int i=0; i < sampleRate; i++ ) {
 
-        int x =  round(sin(  i * w   * frequency ) * amplitude );
+        int x =  round(sin(  i * w   * frequency ) * (amplitude));
 
 
 
@@ -202,4 +203,11 @@ void MainWindow::soundStatus()
     ui->sbAmp->setDisabled(block);
     ui->sbFreq->setDisabled(block);
     ui->sbSec->setDisabled(block);
+}
+
+
+void MainWindow::soundProgess(unsigned int value, double sec)
+{
+    tela->setDx(value/(this->nChannel*this->bitDepth));
+    sec = sec * sec;
 }

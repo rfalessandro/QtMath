@@ -16,7 +16,7 @@ private:
     int nChannel;
     long time;
     unsigned const char *buffer;
-    int szBuffer;
+    unsigned int szBuffer;
     int error;
     bool playing;
 public:
@@ -29,7 +29,7 @@ public:
     int getBitDepth();
     int getNChannel();
 
-    void setBuffer(unsigned const char *buffer, int szBuffer);
+    void setBuffer(unsigned const char *buffer, unsigned int szBuffer);
 
     long getTime();
     void play();
@@ -42,6 +42,7 @@ public slots:
 signals:
     void stopSound();
     void startSound();
+    void progress(unsigned int value, double sec);
 
 
 };
