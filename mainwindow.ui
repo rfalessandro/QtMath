@@ -148,6 +148,13 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QLabel" name="lbSecs">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -256,7 +263,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="sbZoom"/>
+         <widget class="QDoubleSpinBox" name="sbZoom">
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btRecalc">

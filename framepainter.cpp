@@ -16,7 +16,7 @@ FramePainter::FramePainter(QWidget *parent) :
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
     graphBackgroundColor = QColor(0x44, 0x88, 0x33, 0x88);
     lineColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
-
+    pointColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
     dx = 0;
     dy = 0;
     zoom = 1;
@@ -53,7 +53,12 @@ void FramePainter::mouseMoveEvent(QMouseEvent *evt)
 
 void FramePainter::wheelEvent(QWheelEvent *evt)
 {
-    zoom = std::max(1, zoom + evt->delta()/120);
+
+    zoom = (zoom) + evt->delta()/120;
+//    if(zoom < 0) {
+//        zoom = (120 + zoom)/120;
+//    }
+
 
     //dx =  std::max(0, this->rect().width() -  (evt->globalX()  ) / zoom );
     //printf(" [%d] ", dx );
@@ -73,7 +78,7 @@ int FramePainter::getDx()
     return this->dx;
 }
 
-int FramePainter::getZoom()
+double FramePainter::getZoom()
 {
     return this->zoom;
 }
@@ -86,6 +91,11 @@ QColor FramePainter::getBackgroundColor()
 QColor FramePainter::getLineColor()
 {
     return this->lineColor;
+}
+
+QColor FramePainter::getPointColor()
+{
+    return this->pointColor;
 }
 
 QColor FramePainter::getGraphBackgroundColor()
@@ -104,9 +114,23 @@ void FramePainter::setDy(int dy)
         this->dy = dy;
         emit valueChanged();
         repaint();
-
     }
+}
 
+void FramePainter::setPointDx(int pointDx)
+{
+    if(this->pointDx != pointDx) {
+        this->pointDx = pointDx;
+        double aux = pointDx/(this->nChannel*this->bitDepth) ;
+
+        if(aux >  dx + width()/zoom - 150 * zoom) {
+            //setDx(aux +  width()*zoom/2);
+            setDx(dx + 150 * zoom);
+        }
+
+        //emit valueChanged();
+        repaint();
+    }
 }
 
 void FramePainter::setDx(int dx)
@@ -118,7 +142,7 @@ void FramePainter::setDx(int dx)
     }
 }
 
-void FramePainter::setZoom(int zoom)
+void FramePainter::setZoom(double zoom)
 {
     if(this->zoom != zoom) {
         this->zoom = zoom;
@@ -139,6 +163,15 @@ void FramePainter::setLineColor(const QColor &lineColor)
 {
     if(this->lineColor != lineColor) {
         this->lineColor = lineColor;
+        repaint();
+    }
+}
+
+
+void FramePainter::setPointColor(const QColor &pointColor)
+{
+    if(this->pointColor != pointColor) {
+        this->pointColor = pointColor;
         repaint();
     }
 }
@@ -172,6 +205,9 @@ void FramePainter::drawBackground(QPainter *paint, QRect *rect)
     paint->setPen(lineColor);
     paint->drawLine(0, middle, rect->width(), middle);
 
+
+
+
     int aux1 = middle - 5  ;
     int aux2 = middle + 5 ;
 
@@ -192,7 +228,7 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
 
     unsigned int j = dx * (this->nChannel * this->bitDepth) ;
 
-    int i;
+    double i;
     for( i = 0; i < rect->width() + zoom  && j < szBuffer ; i += zoom ) {
 
         //int p = middle - pyList.at(j)  * zoom;
@@ -217,11 +253,22 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
         int p = middle - value;
         paint->setBrush(graphLineColor);
         paint->drawEllipse(i-2, p-2, 4, 4 );
+
+        if( j == (unsigned int)pointDx ) {
+            paint->setBrush(pointColor);
+            int v = 50 * zoom;
+            paint->drawEllipse(i-v/2,p-v/2,v,v);
+        }
+
         poly << QPoint(i,p);
         j += (this->nChannel * this->bitDepth);
+
+
+
+
     }
     paint->setBrush(graphBackgroundColor);
-    poly << QPoint( std::min(rect->width(), i) , middle);
+    poly << QPoint( std::min(rect->width(), (int)i) , middle);
     QPainterPath path;
     path.addPolygon(poly);
     paint->fillPath(path, graphBackgroundColor);

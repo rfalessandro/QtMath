@@ -16,11 +16,14 @@ private:
     unsigned const char *buffer;
     QColor backgroundColor;
     QColor lineColor;
+    QColor pointColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
+
     int dy;
     int dx;
-    int zoom;
+    int pointDx;
+    double zoom;
 
     int bitDepth;
     int nChannel;
@@ -37,9 +40,13 @@ public:
 
     int getDy();
     int getDx();
-    int getZoom();
+    int getPointDx();
+
+
+    double getZoom();
     QColor getBackgroundColor();
     QColor getLineColor();
+    QColor getPointColor();
     QColor getGraphBackgroundColor();
     QColor getGraphLineColor();
 
@@ -47,11 +54,14 @@ public:
 
     void setDy(int dy);
     void setDx(int dx);
-    void setZoom(int zoom);
+    void setPointDx(int dx);
+    void setZoom(double zoom);
     void setBackgroundColor(const QColor &backgroundColor);
     void setLineColor(const QColor &lineColor);
+    void setPointColor(const QColor &graphLineColor);
     void setGraphBackgroundColor(const QColor &graphBackgroundColor);
     void setGraphLineColor(const QColor &graphLineColor);
+
 
 signals:
     void valueChanged();

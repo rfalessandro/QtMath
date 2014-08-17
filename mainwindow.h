@@ -26,6 +26,7 @@ private:
     Ui::MainWindow *ui;
     FramePainter *tela;
     QThread *t;
+
     Sound *sound;
     unsigned char *buffer;
     unsigned int szBuffer;

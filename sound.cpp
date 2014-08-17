@@ -164,10 +164,11 @@ void Sound::run() {
     info.sprintf(" Period Time: %d  , ", val2);
 
 
-
+    desloc = 0;
     loops = this->time / val2;
-    while (loops > 0 && playing) {
-        loops--;
+    unsigned int it = 0;
+    while (it < loops  && playing) {
+
         memcpy(bufferToPlay, buffer+desloc, size);
 
         desloc += size;
@@ -185,7 +186,8 @@ void Sound::run() {
         }  else if (rc != (int)frames) {
             str.sprintf("short write, write %d frames\n", rc);
         }
-        emit progress(desloc, (((double)val2) * (double)loops)/1000000.0);
+        it++;
+        emit progress(desloc, (((double)val2) * (double)it)/1000000.0);
     }
     snd_pcm_drain(handle);
     snd_pcm_close(handle);

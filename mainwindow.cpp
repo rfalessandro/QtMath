@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->vlFrame->addWidget((QWidget *)this->tela);
     tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     tela->setLineColor(QColor(0x67, 0x95, 0x94, 0x70));
+    tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));
     tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
     tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 70));
 
@@ -40,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->sbDx, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbDy, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
-    connect(ui->sbZoom, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
+    connect(ui->sbZoom, SIGNAL(valueChanged(double)), this, SLOT(updateFrame()));
 
 
 
@@ -53,11 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     sound->moveToThread(t);
 
+
+
     connect(t, SIGNAL(started()), sound, SLOT(process()));
 
 
     t->start();
-
 
     this->nChannel = 2;
 //    this->bitDepth = 2;
@@ -133,7 +135,7 @@ void MainWindow::makeGraph()
     }
 
     unsigned int j=0;
-    unsigned char *aux;
+    unsigned char *aux = NULL;
 
     for(int i=0; i < sampleRate; i++ ) {
 
@@ -193,6 +195,8 @@ void MainWindow::soundStatus()
     bool block;
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");
+        tela->setDx(0);
+        tela->setDy(0);
         block = true;
     }else {
         t->exit();
@@ -207,7 +211,8 @@ void MainWindow::soundStatus()
 
 
 void MainWindow::soundProgess(unsigned int value, double sec)
-{
-    tela->setDx(value/(this->nChannel*this->bitDepth));
-    sec = sec * sec;
+{    
+ //   tela->setDx(value/(this->nChannel*this->bitDepth));
+    tela->setPointDx(value);
+    ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }
