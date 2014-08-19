@@ -19,12 +19,15 @@ private:
     QColor pointColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
+    QPolygon *graph;
 
     int dy;
     int dx;
     int pointDx;
     double zoom;
 
+
+    int sampleRate;
     int bitDepth;
     int nChannel;
     unsigned int szBuffer;
@@ -50,7 +53,7 @@ public:
     QColor getGraphBackgroundColor();
     QColor getGraphLineColor();
 
-    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel);
+    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate);
 
     void setDy(int dy);
     void setDx(int dx);

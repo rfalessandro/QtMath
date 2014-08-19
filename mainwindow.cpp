@@ -170,7 +170,7 @@ void MainWindow::makeGraph()
     }
 
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
 
     tela->repaint();
 }
@@ -212,7 +212,7 @@ void MainWindow::soundStatus()
 
 void MainWindow::soundProgess(unsigned int value, double sec)
 {    
- //   tela->setDx(value/(this->nChannel*this->bitDepth));
+
     tela->setPointDx(value);
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }

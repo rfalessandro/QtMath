@@ -65,7 +65,7 @@ void Sound::setBuffer(unsigned const char *buffer, unsigned int sz)
 
 void Sound::run() {
     playing = true;
-    emit startSound();
+
     this->error = 0;
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
@@ -167,6 +167,7 @@ void Sound::run() {
     desloc = 0;
     loops = this->time / val2;
     unsigned int it = 0;
+    emit startSound();
     while (it < loops  && playing) {
 
         memcpy(bufferToPlay, buffer+desloc, size);
