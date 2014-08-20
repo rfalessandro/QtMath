@@ -35,7 +35,7 @@ private:
 
     void drawGraph(QPainter *paint, QRect *rect);
     void drawBackground(QPainter *paint, QRect *rect);
-
+    void createPoly();
 
     QPoint ptOld;
 public:

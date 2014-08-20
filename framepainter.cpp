@@ -33,8 +33,41 @@ void FramePainter::setBuffer(unsigned const char *buffer, unsigned int szBuffer,
     this->szBuffer = szBuffer;
     this->buffer = buffer;
     this->sampleRate = sampleRate;
+
+    createPoly();
 }
 
+void FramePainter::createPoly()
+{
+    if(graph == NULL) {
+        delete (graph);
+    }
+    graph = new QPolygon;
+    unsigned int j = 0;
+    for(unsigned int i = 0; j < szBuffer ; i ++ ) {
+
+        //int p = middle - pyList.at(j)  * zoom;
+        int value = 0;
+        switch ( this->bitDepth) {
+            case 1:
+                value = MathUtil::to8Le(buffer, j);
+                break;
+            case 2:
+                value = MathUtil::to16Le(buffer, j);
+                break;
+            case 3:
+                value = MathUtil::to24Le(buffer, j);
+                break;
+            case 4:
+                value = MathUtil::to32Le(buffer, j);
+                break;
+            default:
+                break;
+        }
+        graph->append(QPoint(i,value));
+        j += (this->nChannel * this->bitDepth);
+    }
+}
 
 void FramePainter::mousePressEvent(QMouseEvent *evt)
 {
@@ -193,9 +226,6 @@ void FramePainter::setGraphLineColor(const QColor &graphLineColor)
     }
 }
 
-
-
-
 void FramePainter::drawBackground(QPainter *paint, QRect *rect)
 {
 
@@ -227,73 +257,29 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
 {
 
     int middle = rect->height()/2. + dy;
-    QPolygon poly;
-    poly << QPoint(0, middle);
-
-
-
-
-
-    unsigned int j = dx * (this->nChannel * this->bitDepth) ;
-    int i = 0;
-    double iZoom = 0;
-
-    for( i = 0; iZoom < rect->width() + zoom  && j < szBuffer ; i ++ ) {
-
-        //int p = middle - pyList.at(j)  * zoom;
-        int value = 0;
-        switch ( this->bitDepth) {
-            case 1:
-                value = MathUtil::to8Le(buffer, j);
-                break;
-            case 2:
-                value = MathUtil::to16Le(buffer, j);
-                break;
-            case 3:
-                value = MathUtil::to24Le(buffer, j);
-                break;
-            case 4:
-                value = MathUtil::to32Le(buffer, j);
-                break;
-            default:
-                break;
-        }
-        iZoom = i * zoom;
-        value = value * zoom;
-        int p = middle - value;
-
-
-        paint->setBrush(graphLineColor);
-        paint->drawEllipse(iZoom-2, p-2, 4, 4 );
-
-        if( j == (unsigned int)pointDx ) {
-            paint->setBrush(pointColor);
-            int v = 50 * zoom;
-            paint->drawEllipse(iZoom-v/2,p-v/2,v,v);
-        }
-
-        poly << QPoint(iZoom,p);
-        j += (this->nChannel * this->bitDepth);
-    }
+//    QPolygon poly;
+//    poly << QPoint(0, middle);
     paint->setBrush(graphBackgroundColor);
-
     paint->setRenderHint(QPainter::Antialiasing);
-    poly << QPoint( std::min(rect->width(), (int)iZoom) , middle);
-    paint->drawConvexPolygon(poly);
-
-//    QPainterPath path;
-//    path.addPolygon(poly);
-//    paint->fillPath(path, graphBackgroundColor);
+    //poly << QPoint( std::min(rect->width(), (int)iZoom) , middle);
+    //paint->drawConvexPolygon(poly);
+    QMatrix translationTransform(1, 0, 0, 1, -dx, middle);
+    QMatrix rotationTransform(1, 0, 0, 1, 0, 0);
+    QMatrix scalingTransform(zoom, 0, 0, zoom, 0, 0);
+    QMatrix transform = scalingTransform * rotationTransform * translationTransform;
+    paint->setMatrix(transform);
+    paint->drawPolygon(*graph);
 
 }
 
 
-void FramePainter::paintEvent(QPaintEvent *)
+void FramePainter::paintEvent(QPaintEvent *e)
 {
+    Q_UNUSED(e);
     QPainter *paint = new QPainter (this);
     QRect *rect = new  QRect(this->rect().left(), this->rect().top(), this->rect().width() - 1, this->rect().height()-1);
 
-    //paint->save();
+  //  paint->save();
 
     if(!paint->isActive()) {
         paint->begin (this);    
@@ -302,7 +288,7 @@ void FramePainter::paintEvent(QPaintEvent *)
     drawBackground(paint, rect);
     drawGraph(paint, rect);
 
-    //paint->restore();
+//    paint->restore();
 
     paint->end ();
 
