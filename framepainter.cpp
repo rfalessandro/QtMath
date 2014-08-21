@@ -7,6 +7,8 @@
 #include <QApplication>
 #include <mathutil.h>
 
+#include <QtGui>
+
 FramePainter::FramePainter(QWidget *parent) :
     QWidget(parent)
 {
@@ -43,8 +45,9 @@ void FramePainter::createPoly()
         delete (graph);
     }
     graph = new QPolygon;
-    unsigned int j = 0;
-    for(unsigned int i = 0; j < szBuffer ; i ++ ) {
+    unsigned int i = 0,j = 0;
+    graph->append(QPoint(0,0));
+    for( i = 0; j < szBuffer ; i ++ ) {
 
         //int p = middle - pyList.at(j)  * zoom;
         int value = 0;
@@ -64,9 +67,10 @@ void FramePainter::createPoly()
             default:
                 break;
         }
-        graph->append(QPoint(i,value));
+        graph->append(QPoint(i, - value));
         j += (this->nChannel * this->bitDepth);
     }
+    graph->append(QPoint(i,0));
 }
 
 void FramePainter::mousePressEvent(QMouseEvent *evt)
@@ -151,7 +155,7 @@ void FramePainter::setDy(int dy)
     }
 }
 
-void FramePainter::setPointDx(int pointDx)
+void FramePainter::setPointDx(int pointDx, bool isAnimation)
 {
     if(this->pointDx != pointDx) {
         this->pointDx = pointDx;
@@ -163,7 +167,10 @@ void FramePainter::setPointDx(int pointDx)
         }
 
         //emit valueChanged();
-        repaint();
+        if(!isAnimation) {
+            elapsed = 0;
+            repaint();
+        }
     }
 }
 
@@ -226,6 +233,15 @@ void FramePainter::setGraphLineColor(const QColor &graphLineColor)
     }
 }
 
+
+void FramePainter::animate()
+{
+    elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
+    setPointDx(elapsed , true);
+    repaint();
+}
+
+
 void FramePainter::drawBackground(QPainter *paint, QRect *rect)
 {
 
@@ -235,7 +251,6 @@ void FramePainter::drawBackground(QPainter *paint, QRect *rect)
 
     paint->setPen(lineColor);
     paint->drawLine(0, middle, rect->width(), middle);
-
 
 
     double time = std::max(1., (this->sampleRate/5)*zoom);
@@ -250,6 +265,10 @@ void FramePainter::drawBackground(QPainter *paint, QRect *rect)
         paint->drawLine(i - dxZoom , aux1, i -dxZoom , aux2);
     }
 
+    paint->setBrush(pointColor);
+
+    //dx + width()/zoom - 150 * zoom
+    paint->drawEllipse((pointDx*this->nChannel*this->bitDepth) - dx , middle, 100,100);
 }
 
 

@@ -38,6 +38,8 @@ private:
     void createPoly();
 
     QPoint ptOld;
+
+    int elapsed;
 public:
     explicit FramePainter(QWidget *parent = 0);    
 
@@ -57,7 +59,7 @@ public:
 
     void setDy(int dy);
     void setDx(int dx);
-    void setPointDx(int dx);
+    void setPointDx(int dx, bool isAnimation=false );
     void setZoom(double zoom);
     void setBackgroundColor(const QColor &backgroundColor);
     void setLineColor(const QColor &lineColor);
@@ -65,10 +67,10 @@ public:
     void setGraphBackgroundColor(const QColor &graphBackgroundColor);
     void setGraphLineColor(const QColor &graphLineColor);
 
-
 signals:
     void valueChanged();
 public slots:
+    void animate();
 
 
 };

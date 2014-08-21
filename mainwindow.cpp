@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <QFuture>
 #include <mathutil.h>
-
+#include <QTimer>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -60,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     t->start();
+
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), tela, SLOT(animate()));
+
 
     this->nChannel = 2;
 //    this->bitDepth = 2;
@@ -197,10 +201,22 @@ void MainWindow::soundStatus()
         ui->btPlay->setText("Stop");
         tela->setDx(0);
         tela->setDy(0);
+
+
+        tela->setPointDx(0);
+        timer->start(50);
+
         block = true;
     }else {
         t->exit();
+
+
+        timer->stop();
+
         ui->btPlay->setText("Play");
+
+
+
         block = false;
     }
     ui->cbDepth->setDisabled(block);
@@ -213,6 +229,6 @@ void MainWindow::soundStatus()
 void MainWindow::soundProgess(unsigned int value, double sec)
 {    
 
-    tela->setPointDx(value);
+//    tela->setPointDx(value);
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }
