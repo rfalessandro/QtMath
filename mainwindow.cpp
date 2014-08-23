@@ -17,9 +17,11 @@ MainWindow::MainWindow(QWidget *parent) :
     tela = new FramePainter;
     ui->vlFrame->addWidget((QWidget *)this->tela);
     tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
-    tela->setLineColor(QColor(0x67, 0x95, 0x94, 0x70));
-    tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));
-    tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
+
+    tela->setLineColor(QColor(0xF4, 0xAC, 0x50, 0x70));
+    tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));    
+    //tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
+    tela->setGraphLineColor(QColor(0x2D, 0x67, 0x69));
     tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 70));
 
 
@@ -84,6 +86,9 @@ MainWindow::~MainWindow()
         free(buffer);
     }
     t->exit();
+    timer->stop();
+    delete t;
+    delete timer;
     delete sound;
     delete tela;
     delete ui;
@@ -204,7 +209,7 @@ void MainWindow::soundStatus()
 
 
         tela->setPointDx(0);
-        timer->start(50);
+        timer->start(10);
 
         block = true;
     }else {

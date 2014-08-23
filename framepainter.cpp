@@ -22,8 +22,9 @@ FramePainter::FramePainter(QWidget *parent) :
     dx = 0;
     dy = 0;
     zoom = 1;
-
-    szBuffer = 0;
+    pointDx = 0;
+    elapsed = 0;
+    szBuffer = 0;    
 
 }
 
@@ -159,11 +160,10 @@ void FramePainter::setPointDx(int pointDx, bool isAnimation)
 {
     if(this->pointDx != pointDx) {
         this->pointDx = pointDx;
-        double aux = pointDx/(this->nChannel*this->bitDepth) ;
 
-        if(aux >  dx + width()/zoom - 150 * zoom) {
-            //setDx(aux +  width()*zoom/2);
-            setDx(dx + 150 * zoom);
+        if(pointDx > dx + width()/zoom) {
+            setDx(pointDx + (width()/zoom)/2);
+            return;
         }
 
         //emit valueChanged();
@@ -236,9 +236,13 @@ void FramePainter::setGraphLineColor(const QColor &graphLineColor)
 
 void FramePainter::animate()
 {
-    elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
-    setPointDx(elapsed , true);
-    repaint();
+    if(graph != NULL) {
+        elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
+        //printf("{%d}\n", elapsed);
+        setPointDx( ((elapsed * this->sampleRate)/1000)  % graph->length(), true);
+
+        repaint();
+    }
 }
 
 
@@ -265,10 +269,6 @@ void FramePainter::drawBackground(QPainter *paint, QRect *rect)
         paint->drawLine(i - dxZoom , aux1, i -dxZoom , aux2);
     }
 
-    paint->setBrush(pointColor);
-
-    //dx + width()/zoom - 150 * zoom
-    paint->drawEllipse((pointDx*this->nChannel*this->bitDepth) - dx , middle, 100,100);
 }
 
 
@@ -276,18 +276,22 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
 {
 
     int middle = rect->height()/2. + dy;
-//    QPolygon poly;
-//    poly << QPoint(0, middle);
+    paint->setPen(graphLineColor);
     paint->setBrush(graphBackgroundColor);
     paint->setRenderHint(QPainter::Antialiasing);
-    //poly << QPoint( std::min(rect->width(), (int)iZoom) , middle);
-    //paint->drawConvexPolygon(poly);
-    QMatrix translationTransform(1, 0, 0, 1, -dx, middle);
+
+    QMatrix translationTransform(1, 0, 0, 1, -dx*zoom, middle);
     QMatrix rotationTransform(1, 0, 0, 1, 0, 0);
     QMatrix scalingTransform(zoom, 0, 0, zoom, 0, 0);
     QMatrix transform = scalingTransform * rotationTransform * translationTransform;
     paint->setMatrix(transform);
     paint->drawPolygon(*graph);
+
+
+    paint->setBrush(pointColor);
+    if(graph != NULL && graph->size() > pointDx) {   
+        paint->drawEllipse( pointDx  -50, graph->at(pointDx).y()-50, 100,100);
+    }
 
 }
 

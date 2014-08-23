@@ -20,6 +20,7 @@ private:
     QColor graphBackgroundColor;
     QColor graphLineColor;
     QPolygon *graph;
+    QPolygon *timeLine;
 
     int dy;
     int dx;
