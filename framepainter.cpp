@@ -23,7 +23,7 @@ FramePainter::FramePainter(QWidget *parent) :
     dy = 0;
     zoom = 1;
     pointDx = 0;
-    elapsed = 0;
+    elapsed = TIMEROUT;
     szBuffer = 0;    
 
 }
@@ -72,6 +72,8 @@ void FramePainter::createPoly()
         j += (this->nChannel * this->bitDepth);
     }
     graph->append(QPoint(i,0));
+
+
 }
 
 void FramePainter::mousePressEvent(QMouseEvent *evt)
@@ -162,15 +164,16 @@ void FramePainter::setPointDx(int pointDx, bool isAnimation)
         this->pointDx = pointDx;
 
         if(pointDx > dx + width()/zoom) {
-            setDx(pointDx + (width()/zoom)/2);
+            setDx(pointDx + (width()/zoom)/2 - 200/zoom) ;
             return;
         }
 
         //emit valueChanged();
         if(!isAnimation) {
-            elapsed = 0;
-            repaint();
+            elapsed = TIMEROUT;
         }
+
+        repaint();
     }
 }
 
@@ -238,10 +241,9 @@ void FramePainter::animate()
 {
     if(graph != NULL) {
         elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
-        //printf("{%d}\n", elapsed);
-        setPointDx( ((elapsed * this->sampleRate)/1000)  % graph->length(), true);
-
-        repaint();
+        printf("{%d}\n", elapsed);
+        setPointDx(std::min(((elapsed * this->sampleRate)/1000)  , graph->length()), true);
+        //repaint();
     }
 }
 
@@ -276,6 +278,7 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
 {
 
     int middle = rect->height()/2. + dy;
+
     paint->setPen(graphLineColor);
     paint->setBrush(graphBackgroundColor);
     paint->setRenderHint(QPainter::Antialiasing);
@@ -284,13 +287,14 @@ void FramePainter::drawGraph(QPainter *paint, QRect *rect)
     QMatrix rotationTransform(1, 0, 0, 1, 0, 0);
     QMatrix scalingTransform(zoom, 0, 0, zoom, 0, 0);
     QMatrix transform = scalingTransform * rotationTransform * translationTransform;
+
     paint->setMatrix(transform);
     paint->drawPolygon(*graph);
 
-
     paint->setBrush(pointColor);
     if(graph != NULL && graph->size() > pointDx) {   
-        paint->drawEllipse( pointDx  -50, graph->at(pointDx).y()-50, 100,100);
+        printf("%d\n", pointDx);
+        paint->drawEllipse( pointDx  - 50 , graph->at(pointDx).y()-50, 100,100);
     }
 
 }
@@ -302,16 +306,19 @@ void FramePainter::paintEvent(QPaintEvent *e)
     QPainter *paint = new QPainter (this);
     QRect *rect = new  QRect(this->rect().left(), this->rect().top(), this->rect().width() - 1, this->rect().height()-1);
 
-  //  paint->save();
+    paint->save();
 
     if(!paint->isActive()) {
         paint->begin (this);    
     }
 
+    //paint->setClipRect(*rect);
+
     drawBackground(paint, rect);
     drawGraph(paint, rect);
 
-//    paint->restore();
+
+    paint->restore();
 
     paint->end ();
 

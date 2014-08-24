@@ -193,8 +193,18 @@ void MainWindow::playSound()
         sound->setSampleRate(sampleRate);
         sound->setBitDepth(this->bitDepth);
         sound->setNChannel(nChannel);
-        sound->setTime(ui->sbSec->value() * 1000000);
+        sound->setTime(ui->sbSec->value() * 1000000);        
+
         t->quit();
+        timer->stop();
+
+        tela->setDx(0);
+        tela->setDy(0);
+        tela->setPointDx(0);
+
+
+        timer->start(FramePainter::TIMEROUT);
+
         t->start();
     }
 }
@@ -204,12 +214,7 @@ void MainWindow::soundStatus()
     bool block;
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");
-        tela->setDx(0);
-        tela->setDy(0);
 
-
-        tela->setPointDx(0);
-        timer->start(10);
 
         block = true;
     }else {
@@ -233,7 +238,6 @@ void MainWindow::soundStatus()
 
 void MainWindow::soundProgess(unsigned int value, double sec)
 {    
-
 //    tela->setPointDx(value);
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }

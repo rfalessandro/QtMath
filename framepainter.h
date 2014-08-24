@@ -21,6 +21,8 @@ private:
     QColor graphLineColor;
     QPolygon *graph;
     QPolygon *timeLine;
+    QImage *image;
+
 
     int dy;
     int dx;
@@ -43,6 +45,8 @@ private:
     int elapsed;
 public:
     explicit FramePainter(QWidget *parent = 0);    
+
+    static const int TIMEROUT = 10;
 
     int getDy();
     int getDx();
