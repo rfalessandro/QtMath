@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <framepainter.h>
+#include <audioscene.h>
 #include <sound.h>
 #include <QThread>
 
@@ -24,9 +24,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    FramePainter *tela;
+    AudioScene *tela;
     QThread *t;
-    QTimer *timer;
     Sound *sound;
     unsigned char *buffer;
     unsigned int szBuffer;

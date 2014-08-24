@@ -17,11 +17,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     framepainter.cpp \
     sound.cpp \
-    mathutil.cpp
+    mathutil.cpp \
+    audioscene.cpp \
+    myitem.cpp \
+    graphsceneitem.cpp
 
 HEADERS  += mainwindow.h \
     framepainter.h \
     sound.h \
-    mathutil.h
-
+    mathutil.h \
+    audioscene.h \
+    myitem.h \
+    graphsceneitem.h
 FORMS    += mainwindow.ui

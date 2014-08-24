@@ -1,4 +1,5 @@
-#include "framepainter.h"
+#include "audioscene.h"
+#include "myitem.h"
 #include <QPainter>
 #include <QtCore/qmath.h>
 #include <algorithm>
@@ -6,13 +7,21 @@
 #include <QPoint>
 #include <QApplication>
 #include <mathutil.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <QtGui>
+#include <QGraphicsPolygonItem>
 
-FramePainter::FramePainter(QWidget *parent) :
-    QWidget(parent)
+AudioScene::AudioScene(QWidget *parent) :
+    QGraphicsView(parent)
 {
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    this->setHorizontalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+    this->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
+
+    scene = new QGraphicsScene(this);
+
+    graph =  NULL;
+    buffer = NULL;
 
     backgroundColor = QColor( 0x22,0x33,0x55, 0xFF);
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
@@ -24,12 +33,32 @@ FramePainter::FramePainter(QWidget *parent) :
     zoom = 1;
     pointDx = 0;
     elapsed = TIMEROUT;
-    szBuffer = 0;    
+    szBuffer = 0;
+
+
+
+
+    setScene(scene);
+
+    //setSceneRect(QRect(0,0,this->width()-10,this->height()-10));
+    //scene->setSceneRect(dx, dy, this->width()-10, this->height()-10);
+
+    setRenderHint(QPainter::Antialiasing);
+    MyItem *item = new MyItem();
+    scene->addItem(item);
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()),scene, SLOT(advance()));
+    timer->start(100);
+
+
 
 }
 
 
-void FramePainter::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate)
+
+
+
+void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate)
 {
     this->nChannel = nChannel;
     this->bitDepth = bitDepth;
@@ -40,15 +69,15 @@ void FramePainter::setBuffer(unsigned const char *buffer, unsigned int szBuffer,
     createPoly();
 }
 
-void FramePainter::createPoly()
+void AudioScene::createPoly()
 {
+
     if(graph == NULL) {
-        delete (graph);
+        graph = new QPolygon;
+    }else {
+        scene->removeItem(graphPoly);
+        delete graph;
     }
-    graph = new QPolygon;
-
-
-
     unsigned int i = 0,j = 0;
     graph->append(QPoint(0,0));
     for( i = 0; j < szBuffer ; i ++ ) {
@@ -70,35 +99,40 @@ void FramePainter::createPoly()
                 break;
             default:
                 break;
-        }        
+        }
         graph->append(QPoint(i, - value));
         j += (this->nChannel * this->bitDepth);
     }
+
     graph->append(QPoint(i,0));
 
 
 
+   graphPoly = new  QGraphicsPolygonItem(*graph);
+   scene->addItem(graphPoly);
 
 
+    updateSceneRect();
+    repaint();
 }
 
-void FramePainter::mousePressEvent(QMouseEvent *evt)
+void AudioScene::mousePressEvent(QMouseEvent *evt)
 {
     this->ptOld = evt->globalPos();
 }
 
-void FramePainter::mouseMoveEvent(QMouseEvent *evt)
+void AudioScene::mouseMoveEvent(QMouseEvent *evt)
 {
     const QPoint delta = evt->globalPos() - ptOld;
     dx = std::max(0, dx - ( delta.x()) );
     dy =  dy + ( delta.y()) ;
     ptOld = evt->globalPos();
 
-    repaint();
+    updateSceneRect();
     emit valueChanged();
 }
 
-void FramePainter::wheelEvent(QWheelEvent *evt)
+void AudioScene::wheelEvent(QWheelEvent *evt)
 {
 
     zoom = (zoom) + evt->delta()/120;
@@ -110,61 +144,61 @@ void FramePainter::wheelEvent(QWheelEvent *evt)
     //dx =  std::max(0, this->rect().width() -  (evt->globalX()  ) / zoom );
     //printf(" [%d] ", dx );
     //dy = evt->globalY();
-    repaint();
+    updateSceneRect();
     emit valueChanged();
 }
 
 
-int FramePainter::getDy()
+int AudioScene::getDy()
 {
     return this->dy;
 }
 
-int FramePainter::getDx()
+int AudioScene::getDx()
 {
     return this->dx;
 }
 
-double FramePainter::getZoom()
+double AudioScene::getZoom()
 {
     return this->zoom;
 }
 
-QColor FramePainter::getBackgroundColor()
+QColor AudioScene::getBackgroundColor()
 {
     return this->backgroundColor;
 }
 
-QColor FramePainter::getLineColor()
+QColor AudioScene::getLineColor()
 {
     return this->lineColor;
 }
 
-QColor FramePainter::getPointColor()
+QColor AudioScene::getPointColor()
 {
     return this->pointColor;
 }
 
-QColor FramePainter::getGraphBackgroundColor()
+QColor AudioScene::getGraphBackgroundColor()
 {
     return this->graphBackgroundColor;
 }
 
-QColor FramePainter::getGraphLineColor()
+QColor AudioScene::getGraphLineColor()
 {
     return this->graphLineColor;
 }
 
-void FramePainter::setDy(int dy)
+void AudioScene::setDy(int dy)
 {
     if(this->dy != dy) {
         this->dy = dy;
         emit valueChanged();
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setPointDx(int pointDx, bool isAnimation)
+void AudioScene::setPointDx(int pointDx, bool isAnimation)
 {
     if(this->pointDx != pointDx) {
         this->pointDx = pointDx;
@@ -179,176 +213,95 @@ void FramePainter::setPointDx(int pointDx, bool isAnimation)
             elapsed = TIMEROUT;
         }
 
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setDx(int dx)
+void AudioScene::setDx(int dx)
 {
     if(this->dx != dx) {
         this->dx = dx;
         emit valueChanged();
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setZoom(double zoom)
+void AudioScene::setZoom(double zoom)
 {
     if(this->zoom != zoom) {
         this->zoom = zoom;
         emit valueChanged();
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setBackgroundColor(const QColor &backgroundColor)
+void AudioScene::setBackgroundColor(const QColor &backgroundColor)
 {
     if(this->backgroundColor != backgroundColor) {
         this->backgroundColor = backgroundColor;
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setLineColor(const QColor &lineColor)
+void AudioScene::setLineColor(const QColor &lineColor)
 {
     if(this->lineColor != lineColor) {
         this->lineColor = lineColor;
-        repaint();
+        updateSceneRect();
     }
 }
 
 
-void FramePainter::setPointColor(const QColor &pointColor)
+void AudioScene::setPointColor(const QColor &pointColor)
 {
     if(this->pointColor != pointColor) {
         this->pointColor = pointColor;
-        repaint();
+        updateSceneRect();
     }
 }
 
-void FramePainter::setGraphBackgroundColor(const QColor &graphBackgroundColor)
+void AudioScene::setGraphBackgroundColor(const QColor &graphBackgroundColor)
 {
     if(this->graphBackgroundColor != graphBackgroundColor) {
-        this->graphBackgroundColor = graphBackgroundColor;        
-        repaint();
+        this->graphBackgroundColor = graphBackgroundColor;
+        updateSceneRect();
     }
 }
 
-void FramePainter::setGraphLineColor(const QColor &graphLineColor)
+void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 {
     if(this->graphLineColor != graphLineColor) {
         this->graphLineColor = graphLineColor;
-        repaint();
+        updateSceneRect();
     }
 }
 
 
-void FramePainter::animate()
+void AudioScene::animate()
 {
-    if(graph != NULL) {
-        elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
-        printf("{%d}\n", elapsed);
-        setPointDx(std::min(((elapsed * this->sampleRate)/1000)  , graph->length()), true);
-        //repaint();
-    }
-}
-
-
-void FramePainter::drawBackground(QPainter *paint, QRect *rect)
-{
-
-    paint->fillRect(*rect, backgroundColor);
-    paint->drawRect(*rect);
-    int middle = rect->height()/2. + dy;
-
-    paint->setPen(lineColor);
-    paint->drawLine(0, middle, rect->width(), middle);
-
-
-    double time = std::max(1., (this->sampleRate/5)*zoom);
-
-
-    int aux1 = (middle - (1000 * zoom));
-    int aux2 = (middle + (1000 * zoom));
-
-    double dxZoom = dx * zoom;
-
-    for(int i=0; i < rect->width() + dxZoom; i+= time ) {
-        paint->drawLine(i - dxZoom , aux1, i -dxZoom , aux2);
-    }
+//    if(graph != NULL) {
+//        elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
+//        printf("{%d}\n", elapsed);
+//        setPointDx(std::min(((elapsed * this->sampleRate)/1000)  , graph->length()), true);
+//        //updateSceneRect();
+//    }
 
 }
 
 
-void FramePainter::drawGraph(QPainter *paint, QRect *rect)
+
+
+
+void AudioScene::updateSceneRect()
 {
-
-    int middle = rect->height()/2. + dy;
-
-    paint->setPen(graphLineColor);
-    paint->setBrush(graphBackgroundColor);
-    paint->setRenderHint(QPainter::Antialiasing);
-
+    int middle = rect().height()/2. + dy;
     QMatrix translationTransform(1, 0, 0, 1, -dx*zoom, middle);
     QMatrix rotationTransform(1, 0, 0, 1, 0, 0);
     QMatrix scalingTransform(zoom, 0, 0, zoom, 0, 0);
     QMatrix transform = scalingTransform * rotationTransform * translationTransform;
-
-    paint->setMatrix(transform);
-
-    paint->drawPolygon(*graph);
-
-    paint->setBrush(pointColor);
-    if(graph != NULL && graph->size() > pointDx) {   
-        printf("%d\n", pointDx);
-        paint->drawEllipse( pointDx  - 50 , graph->at(pointDx).y()-50, 100,100);
+    QList<QGraphicsItem *> ls = scene->items();
+    for (int i =0 ;i< ls.length() ;i++) {
+        ls.at(i)->setMatrix(transform);
     }
+
 }
-
-
-void FramePainter::paintEvent(QPaintEvent *e)
-{
-    Q_UNUSED(e);
-    QRect *rect = new  QRect(this->rect().left(), this->rect().top(), this->rect().width() - 1, this->rect().height()-1);
-    image = new QPixmap(rect->width(),rect->height());
-    QPainter *paint = new QPainter(image);
-    //QPainter *paint = new QPainter (this);
-
-
-    paint->save();
-
-    if(!paint->isActive()) {
-        paint->begin (this);    
-    }
-
-    //paint->setClipRect(*rect);
-
-
-
-    if(image == NULL) {
-        delete (image);
-    }
-
-
-
-    drawBackground(paint, rect);
-//  drawGraph(paint, rect);
-
-
-
-    paint->drawPixmap(*rect, *image);
-
-
-
-    paint->restore();
-
-    paint->end ();
-
-
-
-
-    delete paint;
-    delete rect;
-}
-
-

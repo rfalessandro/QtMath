@@ -1,18 +1,24 @@
-#ifndef FRAMEPAINTER_H
-#define FRAMEPAINTER_H
+#ifndef AUDIOSCENE_H
+#define AUDIOSCENE_H
 
-#include <QWidget>
-
-
-class FramePainter : public QWidget
+#include <QObject>
+#include <QGraphicsScene>
+#include <QTimer>
+#include <QGraphicsView>
+#include <QGraphicsPolygonItem>
+class AudioScene : public QGraphicsView
 {
     Q_OBJECT
+
 protected:
-    void paintEvent(QPaintEvent *);
+
     void mousePressEvent(QMouseEvent *evt);
     void mouseMoveEvent(QMouseEvent *evt);
     void wheelEvent(QWheelEvent *evt);
 private:
+    QGraphicsScene *scene;
+
+    QTimer *timer;
     unsigned const char *buffer;
     QColor backgroundColor;
     QColor lineColor;
@@ -20,8 +26,8 @@ private:
     QColor graphBackgroundColor;
     QColor graphLineColor;
     QPolygon *graph;
-    QPolygon *timeLine;
-    QPixmap *image;
+    QGraphicsPolygonItem *graphPoly;
+
 
 
     int dy;
@@ -36,15 +42,14 @@ private:
     unsigned int szBuffer;
 
 
-    void drawGraph(QPainter *paint, QRect *rect);
-    void drawBackground(QPainter *paint, QRect *rect);
     void createPoly();
 
     QPoint ptOld;
 
     int elapsed;
 public:
-    explicit FramePainter(QWidget *parent = 0);    
+    explicit AudioScene(QWidget *parent = 0);
+
 
     static const int TIMEROUT = 10;
 
@@ -71,13 +76,19 @@ public:
     void setPointColor(const QColor &graphLineColor);
     void setGraphBackgroundColor(const QColor &graphBackgroundColor);
     void setGraphLineColor(const QColor &graphLineColor);
-
+    void updateSceneRect();
+    void animate();
 signals:
     void valueChanged();
 public slots:
-    void animate();
+
 
 
 };
 
-#endif // FRAMEPAINTER_H
+
+
+
+
+
+#endif // AUDIOSCENE_H

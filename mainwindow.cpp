@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "audioscene.h"
 #include <QApplication>
 #include <math.h>
 #include <sound.h>
@@ -14,10 +14,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    tela = new FramePainter;
-    ui->vlFrame->addWidget((QWidget *)this->tela);
-    tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
 
+    tela = new AudioScene;
+
+    ui->vlFrame->addWidget((QWidget *)this->tela);
+
+
+
+    tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     tela->setLineColor(QColor(0xF4, 0xAC, 0x50, 0x70));
     tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));    
     //tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
@@ -63,8 +67,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     t->start();
 
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), tela, SLOT(animate()));
 
 
     this->nChannel = 2;
@@ -76,7 +78,6 @@ MainWindow::MainWindow(QWidget *parent) :
     makeGraph();
 
 
-    new MathUtil();
 }
 
 
@@ -86,9 +87,8 @@ MainWindow::~MainWindow()
         free(buffer);
     }
     t->exit();
-    timer->stop();
+
     delete t;
-    delete timer;
     delete sound;
     delete tela;
     delete ui;
@@ -196,14 +196,11 @@ void MainWindow::playSound()
         sound->setTime(ui->sbSec->value() * 1000000);        
 
         t->quit();
-        timer->stop();
 
         tela->setDx(0);
         tela->setDy(0);
         tela->setPointDx(0);
 
-
-        timer->start(FramePainter::TIMEROUT);
 
         t->start();
     }
@@ -221,7 +218,7 @@ void MainWindow::soundStatus()
         t->exit();
 
 
-        timer->stop();
+
 
         ui->btPlay->setText("Play");
 
