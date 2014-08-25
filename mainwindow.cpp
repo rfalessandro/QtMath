@@ -200,6 +200,7 @@ void MainWindow::playSound()
         tela->setDx(0);
         tela->setDy(0);
         tela->setPointDx(0);
+        tela->animate(ui->sbSec->value() * 1000);
 
 
         t->start();
@@ -216,14 +217,7 @@ void MainWindow::soundStatus()
         block = true;
     }else {
         t->exit();
-
-
-
-
         ui->btPlay->setText("Play");
-
-
-
         block = false;
     }
     ui->cbDepth->setDisabled(block);

@@ -1,6 +1,6 @@
 #ifndef AUDIOSCENE_H
 #define AUDIOSCENE_H
-
+#include "myitem.h"
 #include <QObject>
 #include <QGraphicsScene>
 #include <QTimer>
@@ -22,11 +22,13 @@ private:
     unsigned const char *buffer;
     QColor backgroundColor;
     QColor lineColor;
-    QColor pointColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
+
+    MyItem *ball;
     QPolygon *graph;
     QGraphicsPolygonItem *graphPoly;
+
 
 
 
@@ -51,7 +53,7 @@ public:
     explicit AudioScene(QWidget *parent = 0);
 
 
-    static const int TIMEROUT = 10;
+    static const int TIMEROUT = 50;
 
     int getDy();
     int getDx();
@@ -77,7 +79,7 @@ public:
     void setGraphBackgroundColor(const QColor &graphBackgroundColor);
     void setGraphLineColor(const QColor &graphLineColor);
     void updateSceneRect();
-    void animate();
+    void animate(unsigned int msec);
 signals:
     void valueChanged();
 public slots:

@@ -13,12 +13,16 @@ public:
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
                QWidget *widget);
-
+    void setLineColor(QColor lineColor);
+    void setBackgroundColor(QColor background);
+    void setSpeed(qreal value);
 protected:
     void advance(int phase);
 
 private:
-    qreal angle, speed;
+    qreal speed;
+    QColor lineColor;
+    QColor backgroundColor;
 };
 
 #endif // MYITEM_H

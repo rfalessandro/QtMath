@@ -27,14 +27,13 @@ AudioScene::AudioScene(QWidget *parent) :
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
     graphBackgroundColor = QColor(0x44, 0x88, 0x33, 0x88);
     lineColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
-    pointColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
+
+
     dx = 0;
     dy = 0;
     zoom = 1;
     pointDx = 0;
-    elapsed = TIMEROUT;
     szBuffer = 0;
-
 
 
 
@@ -44,11 +43,18 @@ AudioScene::AudioScene(QWidget *parent) :
     //scene->setSceneRect(dx, dy, this->width()-10, this->height()-10);
 
     setRenderHint(QPainter::Antialiasing);
-    MyItem *item = new MyItem();
-    scene->addItem(item);
+
+    ball = new MyItem;
+    ball->setSpeed( 0 );
+    ball->setBackgroundColor(QColor(0x33,0x66,0x44));
+    ball->setLineColor(QColor(0x33,0x66,0x44));
+    scene->addItem(ball);
+
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()),scene, SLOT(advance()));
-    timer->start(100);
+    timer->start(TIMEROUT);
+
 
 
 
@@ -65,7 +71,6 @@ void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
     this->szBuffer = szBuffer;
     this->buffer = buffer;
     this->sampleRate = sampleRate;
-
     createPoly();
 }
 
@@ -74,9 +79,10 @@ void AudioScene::createPoly()
 
     if(graph == NULL) {
         graph = new QPolygon;
-    }else {
+    }else {        
         scene->removeItem(graphPoly);
-        delete graph;
+        delete graphPoly;
+        graph->clear();
     }
     unsigned int i = 0,j = 0;
     graph->append(QPoint(0,0));
@@ -104,16 +110,15 @@ void AudioScene::createPoly()
         j += (this->nChannel * this->bitDepth);
     }
 
-    graph->append(QPoint(i,0));
-
-
-
+   graph->append(QPoint(i,0));
    graphPoly = new  QGraphicsPolygonItem(*graph);
+   graphPoly->setBrush(graphBackgroundColor);
+   graphPoly->setPen(graphLineColor);
    scene->addItem(graphPoly);
 
 
-    updateSceneRect();
-    repaint();
+   updateSceneRect();
+   repaint();
 }
 
 void AudioScene::mousePressEvent(QMouseEvent *evt)
@@ -174,10 +179,6 @@ QColor AudioScene::getLineColor()
     return this->lineColor;
 }
 
-QColor AudioScene::getPointColor()
-{
-    return this->pointColor;
-}
 
 QColor AudioScene::getGraphBackgroundColor()
 {
@@ -200,20 +201,10 @@ void AudioScene::setDy(int dy)
 
 void AudioScene::setPointDx(int pointDx, bool isAnimation)
 {
-    if(this->pointDx != pointDx) {
-        this->pointDx = pointDx;
-
-        if(pointDx > dx + width()/zoom) {
-            setDx(pointDx + (width()/zoom)/2 - 200/zoom) ;
-            return;
-        }
-
-        //emit valueChanged();
-        if(!isAnimation) {
-            elapsed = TIMEROUT;
-        }
-
-        updateSceneRect();
+    QPointF pos = ball->pos();
+    if(pos.x() != pointDx && pointDx < graph->size() ) {
+        QPointF posGraph = graph->at(pointDx);
+        ball->setPos(posGraph.x() ,  posGraph.y() );
     }
 }
 
@@ -239,7 +230,7 @@ void AudioScene::setBackgroundColor(const QColor &backgroundColor)
 {
     if(this->backgroundColor != backgroundColor) {
         this->backgroundColor = backgroundColor;
-        updateSceneRect();
+        scene->setBackgroundBrush(backgroundColor);
     }
 }
 
@@ -247,17 +238,14 @@ void AudioScene::setLineColor(const QColor &lineColor)
 {
     if(this->lineColor != lineColor) {
         this->lineColor = lineColor;
-        updateSceneRect();
     }
 }
 
 
 void AudioScene::setPointColor(const QColor &pointColor)
-{
-    if(this->pointColor != pointColor) {
-        this->pointColor = pointColor;
-        updateSceneRect();
-    }
+{    
+    ball->setLineColor(graphLineColor);
+    ball->setBackgroundColor(pointColor);
 }
 
 void AudioScene::setGraphBackgroundColor(const QColor &graphBackgroundColor)
@@ -277,15 +265,12 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 }
 
 
-void AudioScene::animate()
+void AudioScene::animate(unsigned int msec)
 {
-//    if(graph != NULL) {
-//        elapsed = (elapsed + qobject_cast<QTimer*>(sender())->interval());
-//        printf("{%d}\n", elapsed);
-//        setPointDx(std::min(((elapsed * this->sampleRate)/1000)  , graph->length()), true);
-//        //updateSceneRect();
-//    }
-
+    if(ball != NULL && graph != NULL) {
+        qreal speed =  ( graph->size() / msec ) * TIMEROUT;
+        ball->setSpeed( speed  );
+    }
 }
 
 
@@ -302,6 +287,5 @@ void AudioScene::updateSceneRect()
     QList<QGraphicsItem *> ls = scene->items();
     for (int i =0 ;i< ls.length() ;i++) {
         ls.at(i)->setMatrix(transform);
-    }
-
+    }    
 }
