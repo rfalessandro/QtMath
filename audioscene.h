@@ -17,50 +17,34 @@ protected:
     void wheelEvent(QWheelEvent *evt);
 private:
     QGraphicsScene *scene;
-
     QTimer *timer;
+    MyItem *ball;
+    QPolygon *graph;
     unsigned const char *buffer;
+    QGraphicsPolygonItem *graphPoly;
     QColor backgroundColor;
     QColor lineColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
-
-    MyItem *ball;
-    QPolygon *graph;
-    QGraphicsPolygonItem *graphPoly;
-
-
-
-
+    QPoint ptOld;
     int dy;
     int dx;
     int pointDx;
     double zoom;
-
-
     int sampleRate;
     int bitDepth;
     int nChannel;
     unsigned int szBuffer;
-
-
     void createPoly();
-
-    QPoint ptOld;
-
-    int elapsed;
 public:
     explicit AudioScene(QWidget *parent = 0);
-
+    ~AudioScene();
 
     static const int TIMEROUT = 50;
 
-    int getDy();
-    int getDx();
-    int getPointDx();
-
-
-    double getZoom();
+    int getDy() const;
+    int getDx() const;
+    double getZoom() const;
     QColor getBackgroundColor();
     QColor getLineColor();
     QColor getPointColor();
@@ -71,7 +55,7 @@ public:
 
     void setDy(int dy);
     void setDx(int dx);
-    void setPointDx(int dx, bool isAnimation=false );
+    void setPointDx(int dx);
     void setZoom(double zoom);
     void setBackgroundColor(const QColor &backgroundColor);
     void setLineColor(const QColor &lineColor);
@@ -80,6 +64,8 @@ public:
     void setGraphLineColor(const QColor &graphLineColor);
     void updateSceneRect();
     void animate(unsigned int msec);
+    void pauseAnimate();
+    void stopAnimate();
 signals:
     void valueChanged();
 public slots:

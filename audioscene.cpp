@@ -21,7 +21,7 @@ AudioScene::AudioScene(QWidget *parent) :
     scene = new QGraphicsScene(this);
 
     graph =  NULL;
-    buffer = NULL;
+
 
     backgroundColor = QColor( 0x22,0x33,0x55, 0xFF);
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
@@ -44,7 +44,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     setRenderHint(QPainter::Antialiasing);
 
-    ball = new MyItem;
+    ball = new MyItem(this);
     ball->setSpeed( 0 );
     ball->setBackgroundColor(QColor(0x33,0x66,0x44));
     ball->setLineColor(QColor(0x33,0x66,0x44));
@@ -154,17 +154,17 @@ void AudioScene::wheelEvent(QWheelEvent *evt)
 }
 
 
-int AudioScene::getDy()
+int AudioScene::getDy() const
 {
     return this->dy;
 }
 
-int AudioScene::getDx()
+int AudioScene::getDx() const
 {
     return this->dx;
 }
 
-double AudioScene::getZoom()
+double AudioScene::getZoom() const
 {
     return this->zoom;
 }
@@ -199,7 +199,7 @@ void AudioScene::setDy(int dy)
     }
 }
 
-void AudioScene::setPointDx(int pointDx, bool isAnimation)
+void AudioScene::setPointDx(int pointDx)
 {
     QPointF pos = ball->pos();
     if(pos.x() != pointDx && pointDx < graph->size() ) {
@@ -274,6 +274,25 @@ void AudioScene::animate(unsigned int msec)
 }
 
 
+void AudioScene::stopAnimate()
+{
+    if(ball != NULL) {
+        ball->setSpeed(0);
+        ball->setPos(0,0);
+        setDx(0);
+        setDy(0);
+    }
+}
+
+
+void AudioScene::pauseAnimate()
+{
+    if(ball != NULL) {
+        ball->setSpeed(0);
+    }
+}
+
+
 
 
 
@@ -287,3 +306,19 @@ void AudioScene::updateSceneRect()
 
 
 }
+
+
+
+
+AudioScene::~AudioScene()
+{
+
+    delete timer;
+    delete ball;
+    delete graph;
+    delete graphPoly;
+    delete scene;
+
+}
+
+

@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 
-MyItem::MyItem()
+MyItem::MyItem(QGraphicsView *view)
 {
+    this->view = view;
     backgroundColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
     lineColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
 
@@ -13,6 +14,8 @@ MyItem::MyItem()
 
     distance = 0;
     setPos(0,0);
+
+
 }
 
 QRectF MyItem::boundingRect() const
@@ -57,16 +60,18 @@ void MyItem::advance(int phase)
 {
     if(!phase) return;
 
-    const AudioScene *t = (AudioScene *)scene();
-    if(t != NULL) {
+
+    AudioScene *t = (AudioScene *)view;
+    if(t != NULL ) {
         qreal newX =  (pos().x()+speed);
         if(newX <= distance) {
-            setPos( newX , pos().y()  );
-           // printf("%f + %f = %f ====== %f \n", pos().x(), speed, newX, mapToScene(pos().x() + speed, pos().y()).x() );
-        }else {
-            ;
-            //printf("%f + %f = %f ====== %f \n", pos().x(), speed, newX, mapToScene(pos().x() + speed, pos().y()).x() );
+            setPos( newX , pos().y()  );           
         }
+//        int paiDx = t->getDx() + (t->width());
+//        if(paiDx < newX ) {
+//            t->setDx(newX + t->width()/2);
+//        }
+
     }
 }
 

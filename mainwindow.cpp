@@ -86,8 +86,7 @@ MainWindow::~MainWindow()
     if(buffer != NULL) {
         free(buffer);
     }
-    t->exit();
-
+    t->exit();    
     delete t;
     delete sound;
     delete tela;
@@ -188,6 +187,7 @@ void MainWindow::playSound()
 {
     if(sound->isPlaying()) {
         sound->stop();
+        tela->stopAnimate();
     }else {
         sound->setBuffer(buffer, szBuffer);
         sound->setSampleRate(sampleRate);
@@ -212,8 +212,6 @@ void MainWindow::soundStatus()
     bool block;
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");
-
-
         block = true;
     }else {
         t->exit();
@@ -228,7 +226,6 @@ void MainWindow::soundStatus()
 
 
 void MainWindow::soundProgess(unsigned int value, double sec)
-{    
-//    tela->setPointDx(value);
+{
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }

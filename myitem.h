@@ -8,7 +8,7 @@
 class MyItem : public QGraphicsItem
 {
 public:
-    MyItem();
+    MyItem(QGraphicsView *view);
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
@@ -21,6 +21,7 @@ protected:
     void advance(int phase);
 
 private:
+    QGraphicsView *view;
     qreal distance;
     double speed;
     QColor lineColor;
