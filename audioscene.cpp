@@ -31,7 +31,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     dx = 0;
     dy = 0;
-    zoom = 1;
+    zoom = 0.01;
     pointDx = 0;
     szBuffer = 0;
 
@@ -269,9 +269,11 @@ void AudioScene::animate(unsigned int msec)
 {
     if(ball != NULL && graph != NULL) {
         qreal speed =  ( graph->size() / msec ) * TIMEROUT;
-        ball->setSpeed( speed  );
+        ball->setMovement(graph->size() , speed  );
     }
 }
+
+
 
 
 
@@ -280,12 +282,8 @@ void AudioScene::animate(unsigned int msec)
 void AudioScene::updateSceneRect()
 {
     int middle = rect().height()/2. + dy;
-    QMatrix translationTransform(1, 0, 0, 1, -dx*zoom, middle);
-    QMatrix rotationTransform(1, 0, 0, 1, 0, 0);
-    QMatrix scalingTransform(zoom, 0, 0, zoom, 0, 0);
-    QMatrix transform = scalingTransform * rotationTransform * translationTransform;
-    QList<QGraphicsItem *> ls = scene->items();
-    for (int i =0 ;i< ls.length() ;i++) {
-        ls.at(i)->setMatrix(transform);
-    }    
+    setTransform(QTransform().scale(zoom, zoom));
+    scene->setSceneRect(dx, -middle, width(), height());
+
+
 }

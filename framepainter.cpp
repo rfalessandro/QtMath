@@ -21,7 +21,7 @@ FramePainter::FramePainter(QWidget *parent) :
     pointColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
     dx = 0;
     dy = 0;
-    zoom = 1;
+    zoom = 0.01;
     pointDx = 0;
     elapsed = TIMEROUT;
     szBuffer = 0;    

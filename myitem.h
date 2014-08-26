@@ -15,12 +15,14 @@ public:
                QWidget *widget);
     void setLineColor(QColor lineColor);
     void setBackgroundColor(QColor background);
-    void setSpeed(qreal value);
+    void setSpeed(double value);
+    void setMovement(qreal distance, double speed);
 protected:
     void advance(int phase);
 
 private:
-    qreal speed;
+    qreal distance;
+    double speed;
     QColor lineColor;
     QColor backgroundColor;
 };

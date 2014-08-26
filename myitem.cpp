@@ -1,5 +1,8 @@
 #include "myitem.h"
 #include "audioscene.h"
+
+#include <stdio.h>
+
 MyItem::MyItem()
 {
     backgroundColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
@@ -8,16 +11,13 @@ MyItem::MyItem()
     // set the speed
     speed = 5;  // 5 pixels
 
-    // random start position
-    int startX = 0;
-    int startY = 0;
-
+    distance = 0;
     setPos(0,0);
 }
 
 QRectF MyItem::boundingRect() const
 {
-    return QRect(0,0,50,50);
+    return QRect(0,0,450,450);
 }
 
 void MyItem::setBackgroundColor(QColor background)
@@ -30,9 +30,15 @@ void MyItem::setLineColor(QColor lineColor)
     this->lineColor = lineColor;
 }
 
-void MyItem::setSpeed(qreal value)
+void MyItem::setSpeed(double value)
 {
     this->speed = value;
+}
+
+void MyItem::setMovement(qreal distance, double speed)
+{
+    this->speed = speed;
+    this->distance = distance;
 }
 
 
@@ -53,7 +59,14 @@ void MyItem::advance(int phase)
 
     const AudioScene *t = (AudioScene *)scene();
     if(t != NULL) {
-        setPos(pos().x()+speed, pos().y());
+        qreal newX =  (pos().x()+speed);
+        if(newX <= distance) {
+            setPos( newX , pos().y()  );
+           // printf("%f + %f = %f ====== %f \n", pos().x(), speed, newX, mapToScene(pos().x() + speed, pos().y()).x() );
+        }else {
+            ;
+            //printf("%f + %f = %f ====== %f \n", pos().x(), speed, newX, mapToScene(pos().x() + speed, pos().y()).x() );
+        }
     }
 }
 
