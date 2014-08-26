@@ -268,7 +268,7 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 void AudioScene::animate(unsigned int msec)
 {
     if(ball != NULL && graph != NULL) {
-        qreal speed =  ( graph->size() / msec ) * TIMEROUT;
+        qreal speed =  ( graph->size() / (msec / TIMEROUT));
         ball->setMovement(graph->size() , speed  );
     }
 }
