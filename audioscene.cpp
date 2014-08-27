@@ -1,5 +1,4 @@
 #include "audioscene.h"
-#include "myitem.h"
 #include <QPainter>
 #include <QtCore/qmath.h>
 #include <algorithm>
@@ -44,7 +43,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     setRenderHint(QPainter::Antialiasing);
 
-    ball = new MyItem(this);
+    ball = new Ball(this);
     ball->setSpeed( 0 );
     ball->setBackgroundColor(QColor(0x33,0x66,0x44));
     ball->setLineColor(QColor(0x33,0x66,0x44));
@@ -334,7 +333,7 @@ void AudioScene::advance(int phase)
 //                setDx(ball->pos().x() + width()/2);
 //            }
 
-            if(ball->pos().x() > mapToScene(width()-10,0).x()) {
+            if((ball->pos().x() ) > mapToScene(width(),0).x()) {
                 setDx(ball->pos().x() + width());
             }
         }

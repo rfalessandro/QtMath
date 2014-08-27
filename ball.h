@@ -1,14 +1,14 @@
-#ifndef MYITEM_H
-#define MYITEM_H
+#ifndef BALL_H
+#define BALL_H
 
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 
-class MyItem : public QGraphicsItem
+class Ball : public QGraphicsItem
 {
 public:
-    MyItem(QGraphicsView *view);
+    Ball(QGraphicsView *view);
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
@@ -29,4 +29,4 @@ private:
     QColor backgroundColor;
 };
 
-#endif // MYITEM_H
+#endif // BALL_H

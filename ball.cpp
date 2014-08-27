@@ -1,9 +1,9 @@
-#include "myitem.h"
+#include "ball.h"
 #include "audioscene.h"
 
 #include <stdio.h>
 
-MyItem::MyItem(QGraphicsView *view)
+Ball::Ball(QGraphicsView *view)
 {
     this->view = view;
     backgroundColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
@@ -18,45 +18,44 @@ MyItem::MyItem(QGraphicsView *view)
 
 }
 
-QRectF MyItem::boundingRect() const
+QRectF Ball::boundingRect() const
 {
-    return QRect(0,0,450,450);
+    return QRect(-175,-175,350,350);
 }
 
-void MyItem::setBackgroundColor(QColor background)
+void Ball::setBackgroundColor(QColor background)
 {
     this->backgroundColor = background;
 }
 
-void MyItem::setLineColor(QColor lineColor)
+void Ball::setLineColor(QColor lineColor)
 {
     this->lineColor = lineColor;
 }
 
-void MyItem::setSpeed(double value)
+void Ball::setSpeed(double value)
 {
     this->speed = value;
 }
 
-void MyItem::setMovement(qreal distance, double speed)
+void Ball::setMovement(qreal distance, double speed)
 {
     this->speed = speed;
     this->distance = distance;
 }
 
 
-void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void Ball::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+
     QRectF rect = boundingRect();
 
-
-    ;
     painter->setPen(QPen(this->lineColor, 2));
     painter->setBrush(backgroundColor);
     painter->drawEllipse(rect);
 }
 
-void MyItem::advance(int phase)
+void Ball::advance(int phase)
 {
     if(!phase) {
         return;
@@ -75,7 +74,7 @@ void MyItem::advance(int phase)
 }
 
 
-double MyItem::getSpeed() const
+double Ball::getSpeed() const
 {
     return this->speed;
 }

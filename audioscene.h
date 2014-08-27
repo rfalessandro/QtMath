@@ -1,6 +1,6 @@
 #ifndef AUDIOSCENE_H
 #define AUDIOSCENE_H
-#include "myitem.h"
+#include "ball.h"
 #include <QObject>
 #include <QGraphicsScene>
 #include <QTimer>
@@ -18,7 +18,7 @@ protected:
 private:
     QGraphicsScene *scene;
     QTimer *timer;
-    MyItem *ball;
+    Ball *ball;
     QPolygon *graph;
     unsigned const char *buffer;
     QGraphicsPolygonItem *graphPoly;

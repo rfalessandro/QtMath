@@ -19,14 +19,12 @@ SOURCES += main.cpp\
     sound.cpp \
     mathutil.cpp \
     audioscene.cpp \
-    myitem.cpp \
-    graphsceneitem.cpp
+    ball.cpp
 
 HEADERS  += mainwindow.h \
     framepainter.h \
     sound.h \
     mathutil.h \
     audioscene.h \
-    myitem.h \
-    graphsceneitem.h
+    ball.h
 FORMS    += mainwindow.ui
