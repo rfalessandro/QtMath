@@ -17,6 +17,7 @@ public:
     void setBackgroundColor(QColor background);
     void setSpeed(double value);
     void setMovement(qreal distance, double speed);
+    double getSpeed() const;
 protected:
     void advance(int phase);
 

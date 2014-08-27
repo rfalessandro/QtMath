@@ -70,6 +70,8 @@ signals:
     void valueChanged();
 public slots:
 
+protected slots:
+    void advance(int phase = 1);
 
 
 };

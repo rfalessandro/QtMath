@@ -51,8 +51,10 @@ AudioScene::AudioScene(QWidget *parent) :
     scene->addItem(ball);
 
 
+
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()),scene, SLOT(advance()));
+    connect(timer, SIGNAL(timeout()),this, SLOT(advance()));
     timer->start(TIMEROUT);
 
 
@@ -322,3 +324,20 @@ AudioScene::~AudioScene()
 }
 
 
+
+void AudioScene::advance(int phase)
+{
+    if(ball != NULL) {
+        if(ball->getSpeed() > 0) {
+//            qreal max = this->dx + width();
+//            if( ball->pos().x() > max ) {
+//                setDx(ball->pos().x() + width()/2);
+//            }
+
+            if(ball->pos().x() > mapToScene(width()-10,0).x()) {
+                setDx(ball->pos().x() + width());
+            }
+        }
+    }
+
+}

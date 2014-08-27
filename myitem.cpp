@@ -58,21 +58,24 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
 void MyItem::advance(int phase)
 {
-    if(!phase) return;
-
-
-    AudioScene *t = (AudioScene *)view;
-    if(t != NULL ) {
-        qreal newX =  (pos().x()+speed);
-        if(newX <= distance) {
-            setPos( newX , pos().y()  );           
-        }
-//        int paiDx = t->getDx() + (t->width());
-//        if(paiDx < newX ) {
-//            t->setDx(newX + t->width()/2);
-//        }
-
+    if(!phase) {
+        return;
     }
+    QPointF newP = mapToParent( +speed , 0  );
+    if(newP.x() <= distance) {
+        setPos( newP);
+    }else {
+        speed = 0;
+    }
+
+
+//    if(newP.x() > mapToParent(scene()->sceneRect().x(), 0).x()) {
+
+//    }
 }
 
 
+double MyItem::getSpeed() const
+{
+    return this->speed;
+}
