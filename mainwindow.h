@@ -5,7 +5,7 @@
 #include <audioscene.h>
 #include <sound.h>
 #include <QThread>
-
+#include "rawinfodialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -32,7 +32,11 @@ private:
     int sampleRate;
     int nChannel;
     int bitDepth;
+    RawInfoDialog *rawInfoDlg;
 
+
+
+    void setBlockGraphComponent(bool block);
 private slots:
     void open();
     void save();
@@ -43,6 +47,7 @@ private slots:
     void updateFrame();
     void soundStatus();
     void soundProgess(unsigned int value, double sec);
+    void acceptRawInfo();
 };
 
 

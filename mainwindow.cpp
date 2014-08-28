@@ -72,6 +72,8 @@ MainWindow::MainWindow(QWidget *parent) :
     t->start();
 
 
+    rawInfoDlg = new  RawInfoDialog(this);
+    connect(rawInfoDlg, SIGNAL(accepted()), this, SLOT(acceptRawInfo()));
 
     this->nChannel = 2;
 //    this->bitDepth = 2;
@@ -222,10 +224,7 @@ void MainWindow::soundStatus()
         ui->btPlay->setText("Play");
         block = false;
     }
-    ui->cbDepth->setDisabled(block);
-    ui->sbAmp->setDisabled(block);
-    ui->sbFreq->setDisabled(block);
-    ui->sbSec->setDisabled(block);
+    setBlockGraphComponent(block);
 }
 
 
@@ -238,38 +237,44 @@ void MainWindow::soundProgess(unsigned int value, double sec)
 
 void MainWindow::open()
 {
-   QString fileName = QFileDialog::getOpenFileName(this, tr("Open Sound"), "", tr("All File (*.*)"));
-   if(fileName != NULL && fileName.length() > 0) {
-         QFile file(fileName);
-         if (!file.open(QIODevice::ReadOnly))  {
-            return;
-         }
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Sound"), "", tr("All File (*.*)"));
+    if(fileName != NULL && fileName.length() > 0) {
+        QFile file(fileName);
+        if(file.exists()) {
+            rawInfoDlg->setModal(true);
+            rawInfoDlg->setFileName(fileName);
+            rawInfoDlg->open();
+        }else {
+            //QDialog::getContentsMargins()
+            ;
+        }
+    }
+}
+
+void MainWindow::acceptRawInfo()
+{
+
+    QFile file(rawInfoDlg->getFileName());
+    if (!file.open(QIODevice::ReadOnly))  {
+        return;
+    }
+    setBlockGraphComponent(true);
 
 
+    if(buffer != NULL) {
+        free(buffer);
+    }
+    szBuffer = file.size();
+    buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
+    file.read((char *)buffer, szBuffer);
 
 
-         bool block = true;
-         ui->cbDepth->setDisabled(block);
-         ui->sbAmp->setDisabled(block);
-         ui->sbFreq->setDisabled(block);
-         ui->sbSec->setDisabled(block);
+    this->bitDepth = rawInfoDlg->getBitDepth();
+    this->sampleRate = rawInfoDlg->getSampleRate();
+    this->nChannel = rawInfoDlg->getNChannel();
 
-
-         if(buffer != NULL) {
-             free(buffer);
-         }
-         szBuffer = file.size();
-         buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
-         file.read((char *)buffer, szBuffer);
-
-
-         this->bitDepth = 2;
-         this->sampleRate = 44100;
-         this->nChannel = 2;
-         tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
-
-         tela->repaint();
-   }
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+    tela->repaint();
 
 }
 
@@ -284,4 +289,13 @@ void MainWindow::save()
           file.write((char *)   buffer, szBuffer);
           file.close();
     }
+}
+
+
+void MainWindow::setBlockGraphComponent(bool block)
+{
+    ui->cbDepth->setDisabled(block);
+    ui->sbAmp->setDisabled(block);
+    ui->sbFreq->setDisabled(block);
+    ui->sbSec->setDisabled(block);
 }
