@@ -34,6 +34,8 @@ private:
     int bitDepth;
 
 private slots:
+    void open();
+    void save();
     void recalc();
     void updateMain();
     void playSound();

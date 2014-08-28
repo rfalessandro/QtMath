@@ -30,7 +30,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     dx = 0;
     dy = 0;
-    zoom = 0.01;
+    zoom = 0.2;
     pointDx = 0;
     szBuffer = 0;
 

@@ -144,7 +144,6 @@ void Sound::run() {
       return ;
     }
 
-
     /* Use a buffer large enough to hold one period */
     snd_pcm_hw_params_get_period_size(params, &frames,&dir);
     info.sprintf(" Period Size: %d  , ", (int)frames);

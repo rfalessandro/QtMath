@@ -9,6 +9,9 @@
 #include <QFuture>
 #include <mathutil.h>
 #include <QTimer>
+
+#include <QFileDialog>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -48,7 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->sbDx, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbDy, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbZoom, SIGNAL(valueChanged(double)), this, SLOT(updateFrame()));
-
+    connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
+    connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(save()));
 
 
 
@@ -123,7 +127,7 @@ void MainWindow::makeGraph()
 
 
 
-    int sampleRate = 44100;
+    this->sampleRate = 44100;
     double w = ( 2 *  M_PI)/sampleRate;
     int frequency = ui->sbFreq->value();
     int amplitude = ui->sbAmp->value();
@@ -228,4 +232,56 @@ void MainWindow::soundStatus()
 void MainWindow::soundProgess(unsigned int value, double sec)
 {
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
+}
+
+
+
+void MainWindow::open()
+{
+   QString fileName = QFileDialog::getOpenFileName(this, tr("Open Sound"), "", tr("All File (*.*)"));
+   if(fileName != NULL && fileName.length() > 0) {
+         QFile file(fileName);
+         if (!file.open(QIODevice::ReadOnly))  {
+            return;
+         }
+
+
+
+
+         bool block = true;
+         ui->cbDepth->setDisabled(block);
+         ui->sbAmp->setDisabled(block);
+         ui->sbFreq->setDisabled(block);
+         ui->sbSec->setDisabled(block);
+
+
+         if(buffer != NULL) {
+             free(buffer);
+         }
+         szBuffer = file.size();
+         buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
+         file.read((char *)buffer, szBuffer);
+
+
+         this->bitDepth = 2;
+         this->sampleRate = 44100;
+         this->nChannel = 2;
+         tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+
+         tela->repaint();
+   }
+
+}
+
+void MainWindow::save()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Open Sound"), "", tr("All File (*.*)"));
+    if(fileName != NULL && fileName.length() > 0) {
+          QFile file(fileName);
+          if (!file.open(QIODevice::WriteOnly))  {
+            return;
+          }
+          file.write((char *)   buffer, szBuffer);
+          file.close();
+    }
 }
