@@ -1,4 +1,5 @@
 #include "audioscene.h"
+#include <QtAlgorithms>
 #include <QPainter>
 #include <QtCore/qmath.h>
 #include <algorithm>
@@ -9,7 +10,7 @@
 #include <stdlib.h>
 #include <QtGui>
 #include <QGraphicsPolygonItem>
-
+#include <audioitem.h>
 AudioScene::AudioScene(QWidget *parent) :
     QGraphicsView(parent)
 {
@@ -19,7 +20,10 @@ AudioScene::AudioScene(QWidget *parent) :
 
     scene = new QGraphicsScene(this);
 
-    graph =  NULL;
+    ball = NULL;
+
+    ball = new Ball();
+
 
 
     backgroundColor = QColor( 0x22,0x33,0x55, 0xFF);
@@ -43,11 +47,6 @@ AudioScene::AudioScene(QWidget *parent) :
 
     setRenderHint(QPainter::Antialiasing);
 
-    ball = new Ball(this);
-    ball->setSpeed( 0 );
-    ball->setBackgroundColor(QColor(0x33,0x66,0x44));
-    ball->setLineColor(QColor(0x33,0x66,0x44));
-    scene->addItem(ball);
 
 
 
@@ -77,16 +76,15 @@ void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
 
 void AudioScene::createPoly()
 {
-
-    if(graph == NULL) {
-        graph = new QPolygon;
-    }else {        
-        scene->removeItem(graphPoly);
-        delete graphPoly;
-        graph->clear();
+    if(scene->items().indexOf(ball) > -1) {
+        scene->removeItem(ball);
     }
+
+    scene->clear();;
     unsigned int i = 0,j = 0;
-    graph->append(QPoint(0,0));
+
+    AudioItem *item;
+
     for( i = 0; j < szBuffer ; i ++ ) {
 
         //int p = middle - pyList.at(j)  * zoom;
@@ -107,19 +105,19 @@ void AudioScene::createPoly()
             default:
                 break;
         }
-        graph->append(QPoint(i, - value));
+        //graph->append(QPoint(i, - value));
+
+        AudioItem *item = new AudioItem;
+        item->setPos(i,-value);
+        item->setLineColor((QColor *)&graphLineColor);
+        item->setBackgroundColor((QColor *)&graphBackgroundColor);
+        scene->addItem(item);
         j += (this->nChannel * this->bitDepth);
     }
-
-   graph->append(QPoint(i,0));
-   graphPoly = new  QGraphicsPolygonItem(*graph);
-   graphPoly->setBrush(graphBackgroundColor);
-   graphPoly->setPen(graphLineColor);
-   scene->addItem(graphPoly);
-
-
-   updateSceneRect();
-   repaint();
+    ball->setMovement(0, 0 );
+    ball->setBackgroundColor(pointColor);
+    ball->setLineColor(graphLineColor);
+    scene->addItem(ball);
 }
 
 void AudioScene::mousePressEvent(QMouseEvent *evt)
@@ -200,14 +198,7 @@ void AudioScene::setDy(int dy)
     }
 }
 
-void AudioScene::setPointDx(int pointDx)
-{
-    QPointF pos = ball->pos();
-    if(pos.x() != pointDx && pointDx < graph->size() ) {
-        QPointF posGraph = graph->at(pointDx);
-        ball->setPos(posGraph.x() ,  posGraph.y() );
-    }
-}
+
 
 void AudioScene::setDx(int dx)
 {
@@ -244,9 +235,10 @@ void AudioScene::setLineColor(const QColor &lineColor)
 
 
 void AudioScene::setPointColor(const QColor &pointColor)
-{    
-    ball->setLineColor(graphLineColor);
-    ball->setBackgroundColor(pointColor);
+{
+    if(this->pointColor != pointColor) {
+        this->pointColor = pointColor;
+    }
 }
 
 void AudioScene::setGraphBackgroundColor(const QColor &graphBackgroundColor)
@@ -268,9 +260,11 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 
 void AudioScene::animate(unsigned int msec)
 {
-    if(ball != NULL && graph != NULL) {
-        qreal speed =  ( graph->size() / (msec / TIMEROUT));
-        ball->setMovement(graph->size() , speed  );
+    if(ball != NULL) {
+        double sz = (double)szBuffer/(this->bitDepth*this->nChannel);
+        //funciona assim
+        qreal speed =  ( sz / (msec / TIMEROUT)) * (this->bitDepth*this->nChannel) ;
+        ball->setMovement( sz, speed  );
     }
 }
 
@@ -296,7 +290,9 @@ void AudioScene::pauseAnimate()
 
 
 
-
+void AudioScene::setPointPos(int x, int y) {
+    ball->setPos(x, y);
+}
 
 
 void AudioScene::updateSceneRect()
@@ -316,8 +312,6 @@ AudioScene::~AudioScene()
 
     delete timer;
     delete ball;
-    delete graph;
-    delete graphPoly;
     delete scene;
 
 }
@@ -326,13 +320,10 @@ AudioScene::~AudioScene()
 
 void AudioScene::advance(int phase)
 {
+    if(!phase)
+        return;
     if(ball != NULL) {
         if(ball->getSpeed() > 0) {
-//            qreal max = this->dx + width();
-//            if( ball->pos().x() > max ) {
-//                setDx(ball->pos().x() + width()/2);
-//            }
-
             if((ball->pos().x() ) > mapToScene(width(),0).x()) {
                 setDx(ball->pos().x() + width());
             }

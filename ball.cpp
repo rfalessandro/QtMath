@@ -3,9 +3,8 @@
 
 #include <stdio.h>
 
-Ball::Ball(QGraphicsView *view)
-{
-    this->view = view;
+Ball::Ball()
+{    
     backgroundColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
     lineColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
 

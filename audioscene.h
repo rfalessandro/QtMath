@@ -19,11 +19,11 @@ private:
     QGraphicsScene *scene;
     QTimer *timer;
     Ball *ball;
-    QPolygon *graph;
     unsigned const char *buffer;
     QGraphicsPolygonItem *graphPoly;
     QColor backgroundColor;
     QColor lineColor;
+    QColor pointColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
     QPoint ptOld;
@@ -36,6 +36,7 @@ private:
     int nChannel;
     unsigned int szBuffer;
     void createPoly();
+
 public:
     explicit AudioScene(QWidget *parent = 0);
     ~AudioScene();
@@ -52,10 +53,9 @@ public:
     QColor getGraphLineColor();
 
     void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate);
-
+    void setPointPos(int x, int y);
     void setDy(int dy);
-    void setDx(int dx);
-    void setPointDx(int dx);
+    void setDx(int dx);    
     void setZoom(double zoom);
     void setBackgroundColor(const QColor &backgroundColor);
     void setLineColor(const QColor &lineColor);

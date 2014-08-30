@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     mathutil.cpp \
     audioscene.cpp \
     ball.cpp \
-    rawinfodialog.cpp
+    rawinfodialog.cpp \
+    audioitem.cpp
 
 HEADERS  += mainwindow.h \
     framepainter.h \
@@ -28,6 +29,7 @@ HEADERS  += mainwindow.h \
     mathutil.h \
     audioscene.h \
     ball.h \
-    rawinfodialog.h
+    rawinfodialog.h \
+    audioitem.h
 FORMS    += mainwindow.ui \
     rawinfodialog.ui

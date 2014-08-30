@@ -8,7 +8,7 @@
 class Ball : public QGraphicsItem
 {
 public:
-    Ball(QGraphicsView *view);
+    Ball();
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
@@ -22,7 +22,6 @@ protected:
     void advance(int phase);
 
 private:
-    QGraphicsView *view;
     qreal distance;
     double speed;
     QColor lineColor;
