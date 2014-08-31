@@ -49,7 +49,7 @@ void Ball::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     QRectF rect = boundingRect();
 
-    painter->setPen(QPen(this->lineColor, 2));
+    painter->setPen(rthis->lineColor);
     painter->setBrush(backgroundColor);
     painter->drawEllipse(rect);
 }
@@ -59,7 +59,7 @@ void Ball::advance(int phase)
     if(!phase) {
         return;
     }
-    QPointF newP = mapToParent( +speed , 0  );
+    QPointF newP = mapToParent( +speed, 0  );
     if(newP.x() <= distance) {
         setPos( newP);
     }else {

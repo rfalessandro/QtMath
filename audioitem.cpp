@@ -4,7 +4,7 @@
 
 AudioItem::AudioItem()
 {
-    rect = new QRectF(0,0,10,10);
+    rect = new QRectF(0,0,2,2);
     backgroundColor = new QColor(0xFF, 0xFF, 0xFF, 0xFF);
     lineColor = new QColor(0xFF, 0xFF, 0xFF, 0xFF);
 }
@@ -35,9 +35,9 @@ void AudioItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     QRectF rect = boundingRect();
 
     painter->setPen(*this->lineColor);
-    painter->setBrush(*backgroundColor);
-    painter->drawLine(QPoint(0,0), QPoint(0,rect.height()));
-    painter->drawEllipse(QPoint(0,rect.height()), rect.width(),rect.width());
+    //painter->setBrush(*backgroundColor);
+    //painter->drawRect(rect);
+    painter->drawEllipse(QPoint(-5,-5), 10,10);
 
 
 }

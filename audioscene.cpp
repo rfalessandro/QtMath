@@ -19,11 +19,7 @@ AudioScene::AudioScene(QWidget *parent) :
     this->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
 
     scene = new QGraphicsScene(this);
-
-    ball = NULL;
-
     ball = new Ball();
-
 
 
     backgroundColor = QColor( 0x22,0x33,0x55, 0xFF);
@@ -71,6 +67,7 @@ void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
     this->szBuffer = szBuffer;
     this->buffer = buffer;
     this->sampleRate = sampleRate;
+    this->szSample = (int)(0.5 + (this->szBuffer / (this->nChannel * this->bitDepth)));
     createPoly();
 }
 
@@ -105,15 +102,15 @@ void AudioScene::createPoly()
             default:
                 break;
         }
-        //graph->append(QPoint(i, - value));
-
         AudioItem *item = new AudioItem;
         item->setPos(i,-value);
+        item->setBoundinRect(new QRectF(0,0,10,value));
         item->setLineColor((QColor *)&graphLineColor);
         item->setBackgroundColor((QColor *)&graphBackgroundColor);
         scene->addItem(item);
         j += (this->nChannel * this->bitDepth);
     }
+
     ball->setMovement(0, 0 );
     ball->setBackgroundColor(pointColor);
     ball->setLineColor(graphLineColor);
@@ -139,15 +136,7 @@ void AudioScene::mouseMoveEvent(QMouseEvent *evt)
 void AudioScene::wheelEvent(QWheelEvent *evt)
 {
 
-    zoom = (zoom) + evt->delta()/120;
-//    if(zoom < 0) {
-//        zoom = (120 + zoom)/120;
-//    }
-
-
-    //dx =  std::max(0, this->rect().width() -  (evt->globalX()  ) / zoom );
-    //printf(" [%d] ", dx );
-    //dy = evt->globalY();
+    zoom = std::max(0.1, (zoom) + evt->delta()/120);
     updateSceneRect();
     emit valueChanged();
 }
@@ -260,11 +249,9 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 
 void AudioScene::animate(unsigned int msec)
 {
-    if(ball != NULL) {
-        double sz = (double)szBuffer/(this->bitDepth*this->nChannel);
-        //funciona assim
-        qreal speed =  ( sz / (msec / TIMEROUT)) * (this->bitDepth*this->nChannel) ;
-        ball->setMovement( sz, speed  );
+    if(ball != NULL) {       
+        qreal speed = ( this->szSample / (msec / TIMEROUT)) ;
+        ball->setMovement( this->szSample, speed  );
     }
 }
 
@@ -309,11 +296,9 @@ void AudioScene::updateSceneRect()
 
 AudioScene::~AudioScene()
 {
-
     delete timer;
     delete ball;
     delete scene;
-
 }
 
 

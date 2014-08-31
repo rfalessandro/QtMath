@@ -31,6 +31,7 @@ private:
     int dx;
     int pointDx;
     double zoom;
+    int szSample;
     int sampleRate;
     int bitDepth;
     int nChannel;
@@ -41,7 +42,7 @@ public:
     explicit AudioScene(QWidget *parent = 0);
     ~AudioScene();
 
-    static const int TIMEROUT = 50;
+    static const int TIMEROUT = 20;
 
     int getDy() const;
     int getDx() const;
