@@ -80,11 +80,53 @@ void AudioScene::createPoly()
     scene->clear();;
     unsigned int i = 0,j = 0;
 
-    AudioItem *item;
 
+    int nPy = pow(2, this->bitDepth*8)/SZ_PIXMAP;
+    int szMiddle = SZ_PIXMAP/2;
+
+
+
+    QList<QPixmap *> lsPxs;
+    QList<QPainter *> lsPainters;
+
+
+
+
+
+
+
+
+    QPixmap *pxMap = NULL;
+    QPainter *painter = NULL;
+    //QPainter *painter = new QPainter(pxMap);
     for( i = 0; j < szBuffer ; i ++ ) {
+        if( i % SZ_PIXMAP == 0) {
 
-        //int p = middle - pyList.at(j)  * zoom;
+          if(painter != NULL) {
+              painter->end();
+              QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*pxMap);
+              itemPx->setPos(i-SZ_PIXMAP, -szMiddle);
+              scene->addItem(itemPx);
+          }
+
+
+        pxMap = new QPixmap(SZ_PIXMAP,SZ_PIXMAP);
+
+        painter = new QPainter(pxMap);
+        painter->fillRect(QRectF(0,0,SZ_PIXMAP,SZ_PIXMAP), Qt::blue);
+        painter->setBrush(graphBackgroundColor);
+
+        lsPxs.append(pxMap);
+        lsPainters.append(painter);
+
+
+
+
+
+
+        }
+
+
         int value = 0;
         switch ( this->bitDepth) {
             case 1:
@@ -102,19 +144,26 @@ void AudioScene::createPoly()
             default:
                 break;
         }
-        AudioItem *item = new AudioItem;
-        item->setPos(i,-value);
-        item->setBoundinRect(new QRectF(0,0,10,value));
-        item->setLineColor((QColor *)&graphLineColor);
-        item->setBackgroundColor((QColor *)&graphBackgroundColor);
-        scene->addItem(item);
+        painter->drawRect(i- SZ_PIXMAP * (lsPxs.length() - 1), szMiddle-value, 20, 20);
         j += (this->nChannel * this->bitDepth);
     }
+
+    if(painter != NULL) {
+        painter->end();
+        QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*pxMap);
+        itemPx->setPos(i-SZ_PIXMAP, -szMiddle);
+        scene->addItem(itemPx);
+    }
+
 
     ball->setMovement(0, 0 );
     ball->setBackgroundColor(pointColor);
     ball->setLineColor(graphLineColor);
     scene->addItem(ball);
+
+
+    lsPainters.clear();
+    lsPxs.clear();
 }
 
 void AudioScene::mousePressEvent(QMouseEvent *evt)

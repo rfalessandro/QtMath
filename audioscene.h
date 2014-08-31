@@ -43,7 +43,7 @@ public:
     ~AudioScene();
 
     static const int TIMEROUT = 20;
-
+    static const int SZ_PIXMAP = 4096;
     int getDy() const;
     int getDx() const;
     double getZoom() const;

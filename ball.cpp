@@ -49,7 +49,7 @@ void Ball::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     QRectF rect = boundingRect();
 
-    painter->setPen(rthis->lineColor);
+    painter->setPen(this->lineColor);
     painter->setBrush(backgroundColor);
     painter->drawEllipse(rect);
 }
