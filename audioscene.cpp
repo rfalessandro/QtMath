@@ -30,7 +30,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     dx = 0;
     dy = 0;
-    zoom = 0.2;
+    zoom = 0.05;
     pointDx = 0;
     szBuffer = 0;
 
@@ -78,80 +78,71 @@ void AudioScene::createPoly()
     }
 
     scene->clear();;
-    unsigned int i = 0,j = 0;
 
 
-    int nPy = pow(2, this->bitDepth*8)/SZ_PIXMAP;
-    int szMiddle = SZ_PIXMAP/2;
+    unsigned int i = 0,j = 0, pos = 0;
+    int nPy = 1 + pow(2, this->bitDepth * 8) / SZ_PIXMAP;
+    int pyMiddle = (nPy)/2;
 
+    int height = this->bitDepth *  SZ_PIXMAP;
+    int szMiddle =   height / 2;
 
 
     QList<QPixmap *> lsPxs;
     QList<QPainter *> lsPainters;
 
-
-
-
-
-
-
-
     QPixmap *pxMap = NULL;
     QPainter *painter = NULL;
-    //QPainter *painter = new QPainter(pxMap);
+
+    //pegar o tamnho maximo dos pontos para gerar  o constypy
+    double constPy =  height /  pow(2, this->bitDepth * 8 );
+
     for( i = 0; j < szBuffer ; i ++ ) {
+
         if( i % SZ_PIXMAP == 0) {
 
-          if(painter != NULL) {
-              painter->end();
-              QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*pxMap);
-              itemPx->setPos(i-SZ_PIXMAP, -szMiddle);
-              scene->addItem(itemPx);
-          }
 
+            //for (int w = 0 ; w < nPy ; w++)         {
+                pxMap = new QPixmap(SZ_PIXMAP,height);
+                painter = new QPainter(pxMap);
+                painter->setPen(graphLineColor);
 
-        pxMap = new QPixmap(SZ_PIXMAP,SZ_PIXMAP);
+                lsPxs.append(pxMap);
+                lsPainters.append(painter);
+          //  }
 
-        painter = new QPainter(pxMap);
-        painter->fillRect(QRectF(0,0,SZ_PIXMAP,SZ_PIXMAP), Qt::blue);
-        painter->setBrush(graphBackgroundColor);
-
-        lsPxs.append(pxMap);
-        lsPainters.append(painter);
-
-
-
-
-
-
+            pos++;
         }
 
 
         int value = 0;
         switch ( this->bitDepth) {
-            case 1:
-                value = MathUtil::to8Le(buffer, j);
-                break;
-            case 2:
-                value = MathUtil::to16Le(buffer, j);
-                break;
-            case 3:
-                value = MathUtil::to24Le(buffer, j);
-                break;
-            case 4:
-                value = MathUtil::to32Le(buffer, j);
-                break;
-            default:
-                break;
+        case 1:
+            value = MathUtil::to8Le(buffer, j);
+            break;
+        case 2:
+            value = MathUtil::to16Le(buffer, j);
+            break;
+        case 3:
+            value = MathUtil::to24Le(buffer, j);
+            break;
+        case 4:
+            value = MathUtil::to32Le(buffer, j);
+            break;
+        default:
+            break;
         }
-        painter->drawRect(i- SZ_PIXMAP * (lsPxs.length() - 1), szMiddle-value, 20, 20);
+        value = szMiddle   - value * constPy;
+        painter->drawRect(i- SZ_PIXMAP * (lsPxs.length() - 1), value, 20, 20);
         j += (this->nChannel * this->bitDepth);
     }
 
-    if(painter != NULL) {
-        painter->end();
-        QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*pxMap);
-        itemPx->setPos(i-SZ_PIXMAP, -szMiddle);
+
+
+    for (i = 0 ; i < lsPxs.length() ; i ++ ) {
+        QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*lsPxs.at(i));
+        lsPainters.at(i)->end();
+        itemPx->setPos(i*SZ_PIXMAP, -szMiddle);
         scene->addItem(itemPx);
     }
 
@@ -298,7 +289,7 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 
 void AudioScene::animate(unsigned int msec)
 {
-    if(ball != NULL) {       
+    if(ball != NULL) {
         qreal speed = ( this->szSample / (msec / TIMEROUT)) ;
         ball->setMovement( this->szSample, speed  );
     }

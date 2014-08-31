@@ -1,3 +1,4 @@
+
 #include "framepainter.h"
 #include <QPainter>
 #include <QtCore/qmath.h>
