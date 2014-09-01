@@ -15,7 +15,6 @@ LIBS += -lasound
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    framepainter.cpp \
     sound.cpp \
     mathutil.cpp \
     audioscene.cpp \
@@ -24,7 +23,6 @@ SOURCES += main.cpp\
     audioitem.cpp
 
 HEADERS  += mainwindow.h \
-    framepainter.h \
     sound.h \
     mathutil.h \
     audioscene.h \

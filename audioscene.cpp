@@ -82,7 +82,6 @@ void AudioScene::createPoly()
         scene->removeItem(ball);
     }
     scene->clear();
-
     unsigned int i = 0,j = 0;
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = 0;
@@ -143,7 +142,6 @@ void AudioScene::mouseMoveEvent(QMouseEvent *evt)
 
 void AudioScene::wheelEvent(QWheelEvent *evt)
 {
-
     zoom = std::max(0.1, (zoom) + evt->delta()/120);
     updateSceneRect();
     emit valueChanged();
@@ -304,8 +302,11 @@ void AudioScene::updateSceneRect()
 
 AudioScene::~AudioScene()
 {
+    timer->stop();
     delete timer;
     delete ball;
+    delete graph;
+    delete graphPoly;
     delete scene;
 }
 
