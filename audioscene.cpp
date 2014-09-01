@@ -19,6 +19,7 @@ AudioScene::AudioScene(QWidget *parent) :
     this->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
 
     scene = new QGraphicsScene(this);
+    graph = NULL;
     ball = new Ball();
 
 
@@ -70,81 +71,48 @@ void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
     this->szSample = (int)(0.5 + (this->szBuffer / (this->nChannel * this->bitDepth)));
     createPoly();
 }
-
 void AudioScene::createPoly()
 {
-    if(scene->items().indexOf(ball) > -1) {
+    if(graph == NULL) {
+        graph = new QPolygon;
+    }else {
+        scene->removeItem(graphPoly);
+        delete graphPoly;
+        graph->clear();
         scene->removeItem(ball);
     }
+    scene->clear();
 
-    scene->clear();;
-
-
-    unsigned int i = 0,j = 0, pos = 0;
-    int nPy = 1 + pow(2, this->bitDepth * 8) / SZ_PIXMAP;
-    int pyMiddle = (nPy)/2;
-
-    int height = this->bitDepth *  SZ_PIXMAP;
-    int szMiddle =   height / 2;
-
-
-    QList<QPixmap *> lsPxs;
-    QList<QPainter *> lsPainters;
-
-    QPixmap *pxMap = NULL;
-    QPainter *painter = NULL;
-
-    //pegar o tamnho maximo dos pontos para gerar  o constypy
-    double constPy =  height /  pow(2, this->bitDepth * 8 );
-
+    unsigned int i = 0,j = 0;
     for( i = 0; j < szBuffer ; i ++ ) {
-
-        if( i % SZ_PIXMAP == 0) {
-
-
-            //for (int w = 0 ; w < nPy ; w++)         {
-                pxMap = new QPixmap(SZ_PIXMAP,height);
-                painter = new QPainter(pxMap);
-                painter->setPen(graphLineColor);
-
-                lsPxs.append(pxMap);
-                lsPainters.append(painter);
-          //  }
-
-            pos++;
-        }
-
-
         int value = 0;
         switch ( this->bitDepth) {
-        case 1:
-            value = MathUtil::to8Le(buffer, j);
-            break;
-        case 2:
-            value = MathUtil::to16Le(buffer, j);
-            break;
-        case 3:
-            value = MathUtil::to24Le(buffer, j);
-            break;
-        case 4:
-            value = MathUtil::to32Le(buffer, j);
-            break;
-        default:
-            break;
+            case 1:
+                value = MathUtil::to8Le(buffer, j);
+                break;
+            case 2:
+                value = MathUtil::to16Le(buffer, j);
+                break;
+            case 3:
+                value = MathUtil::to24Le(buffer, j);
+                break;
+            case 4:
+                value = MathUtil::to32Le(buffer, j);
+                break;
+            default:
+                break;
         }
-        value = szMiddle   - value * constPy;
-        painter->drawRect(i- SZ_PIXMAP * (lsPxs.length() - 1), value, 20, 20);
+        graph->append(QPoint(i, - value));
         j += (this->nChannel * this->bitDepth);
     }
+   QPainterPath path;
+   path.addPolygon(*graph);
+   graphPoly = new QGraphicsPathItem(path);
+//   graphPoly->setBrush(graphBackgroundColor);
+   graphPoly->setPen(QPen(graphLineColor, 3));
+   scene->addItem(graphPoly);
 
 
-
-    for (i = 0 ; i < lsPxs.length() ; i ++ ) {
-        QGraphicsPixmapItem* itemPx = this->scene->addPixmap(*lsPxs.at(i));
-        lsPainters.at(i)->end();
-        itemPx->setPos(i*SZ_PIXMAP, -szMiddle);
-        scene->addItem(itemPx);
-    }
 
 
     ball->setMovement(0, 0 );
@@ -153,9 +121,9 @@ void AudioScene::createPoly()
     scene->addItem(ball);
 
 
-    lsPainters.clear();
-    lsPxs.clear();
+
 }
+
 
 void AudioScene::mousePressEvent(QMouseEvent *evt)
 {

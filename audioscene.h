@@ -20,7 +20,8 @@ private:
     QTimer *timer;
     Ball *ball;
     unsigned const char *buffer;
-    QGraphicsPolygonItem *graphPoly;
+    QPolygon *graph;
+    QGraphicsPathItem *graphPoly;
     QColor backgroundColor;
     QColor lineColor;
     QColor pointColor;
