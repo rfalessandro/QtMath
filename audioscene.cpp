@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <QtGui>
 #include <QGraphicsPolygonItem>
-#include <audioitem.h>
+
 AudioScene::AudioScene(QWidget *parent) :
     QGraphicsView(parent)
 {
