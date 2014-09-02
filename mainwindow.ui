@@ -127,6 +127,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="sbSec">
+          <property name="maximum">
+           <number>9999</number>
+          </property>
           <property name="value">
            <number>1</number>
           </property>
@@ -268,6 +271,12 @@
         </item>
         <item>
          <widget class="QDoubleSpinBox" name="sbZoom">
+          <property name="decimals">
+           <number>4</number>
+          </property>
+          <property name="maximum">
+           <double>99.999899999999997</double>
+          </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
           </property>
@@ -305,7 +314,7 @@
      <x>0</x>
      <y>0</y>
      <width>1089</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -315,7 +324,13 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
    </widget>
+   <widget class="QMenu" name="menuFilters">
+    <property name="title">
+     <string>Filters</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuFilters"/>
   </widget>
   <action name="actionOpen">
    <property name="text">

@@ -6,6 +6,8 @@ RawInfoDialog::RawInfoDialog(QWidget *parent) :
     ui(new Ui::RawInfoDialog)
 {
     ui->setupUi(this);
+    ui->txtSampleRate->setValidator( new QIntValidator(0, 999999999, this) );
+
     ui->cbFormat->addItem(" 8 Bits ",  1);
     ui->cbFormat->addItem(" 16 Bits ", 2);
     ui->cbFormat->addItem(" 24 Bits ", 3);

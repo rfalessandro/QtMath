@@ -9,7 +9,7 @@
 #include <QFuture>
 #include <mathutil.h>
 #include <QTimer>
-
+#include <QMessageBox>
 #include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -245,8 +245,9 @@ void MainWindow::open()
             rawInfoDlg->setFileName(fileName);
             rawInfoDlg->open();
         }else {
-            //QDialog::getContentsMargins()
-            ;
+            QMessageBox messageBox;
+            messageBox.critical(this,"Error","File not found !");
+            messageBox.setFixedSize(500,200);
         }
     }
 }
@@ -256,7 +257,9 @@ void MainWindow::acceptRawInfo()
 
     QFile file(rawInfoDlg->getFileName());
     if (!file.open(QIODevice::ReadOnly))  {
-        return;
+        QMessageBox messageBox;
+        messageBox.critical(this,"Error","Cannot open the File!");
+        messageBox.setFixedSize(500,200);
     }
     setBlockGraphComponent(true);
 

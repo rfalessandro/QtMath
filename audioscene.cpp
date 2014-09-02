@@ -22,7 +22,6 @@ AudioScene::AudioScene(QWidget *parent) :
     graph = NULL;
     ball = new Ball();
 
-
     backgroundColor = QColor( 0x22,0x33,0x55, 0xFF);
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
     graphBackgroundColor = QColor(0x44, 0x88, 0x33, 0x88);
