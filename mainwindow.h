@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
+#include "dialogmakegraph.h"
 #include <QMainWindow>
 #include <audioscene.h>
 #include <sound.h>
@@ -33,12 +33,11 @@ private:
     int nChannel;
     int bitDepth;
     RawInfoDialog *rawInfoDlg;
+    DialogMakeGraph *graphDlg;
 
-
-
-    void setBlockGraphComponent(bool block);
 private slots:
     void open();
+    void openMakeGraph();
     void save();
     void recalc();
     void updateMain();

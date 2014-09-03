@@ -19,13 +19,16 @@ SOURCES += main.cpp\
     mathutil.cpp \
     audioscene.cpp \
     ball.cpp \
-    rawinfodialog.cpp
+    rawinfodialog.cpp \
+    dialogmakegraph.cpp
 
 HEADERS  += mainwindow.h \
     sound.h \
     mathutil.h \
     audioscene.h \
     ball.h \
-    rawinfodialog.h
+    rawinfodialog.h \
+    dialogmakegraph.h
 FORMS    += mainwindow.ui \
-    rawinfodialog.ui
+    rawinfodialog.ui \
+    dialogmakegraph.ui

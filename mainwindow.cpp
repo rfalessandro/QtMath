@@ -33,27 +33,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    ui->cbDepth->addItem(" 8 Bits ",  1);
-    ui->cbDepth->addItem(" 16 Bits ", 2);
-    ui->cbDepth->addItem(" 24 Bits ", 3);
-    ui->cbDepth->addItem(" 32 Bits ", 4);
 
-    ui->cbDepth->setCurrentIndex(1);
 
-    connect(ui->cbDepth, SIGNAL(currentIndexChanged(int)), this, SLOT(makeGraph()));
     connect(ui->btRecalc, SIGNAL(released()), this, SLOT(recalc()));
     connect(tela, SIGNAL(valueChanged()), this, SLOT(updateMain()));
     connect(ui->btPlay, SIGNAL(released()), this, SLOT(playSound()));
-
-    connect(ui->sbFreq, SIGNAL(valueChanged(int)), this, SLOT(makeGraph()));
-    connect(ui->sbAmp, SIGNAL(valueChanged(int)), this, SLOT(makeGraph()));
 
     connect(ui->sbDx, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbDy, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbZoom, SIGNAL(valueChanged(double)), this, SLOT(updateFrame()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(save()));
-
+    connect(ui->actionSin, SIGNAL(triggered()), this, SLOT(openMakeGraph()));
 
 
     sound = new Sound;
@@ -63,27 +54,18 @@ MainWindow::MainWindow(QWidget *parent) :
     t = new QThread;
 
     sound->moveToThread(t);
-
-
-
     connect(t, SIGNAL(started()), sound, SLOT(process()));
-
-
     t->start();
 
 
     rawInfoDlg = new  RawInfoDialog(this);
     connect(rawInfoDlg, SIGNAL(accepted()), this, SLOT(acceptRawInfo()));
 
-    this->nChannel = 2;
-//    this->bitDepth = 2;
+    graphDlg = new  DialogMakeGraph(this);
+    connect(graphDlg, SIGNAL(accepted()), this, SLOT(makeGraph()));
 
     buffer = NULL;
-
     updateMain();
-    makeGraph();
-
-
 }
 
 
@@ -123,69 +105,17 @@ void MainWindow::updateFrame()
 
 void MainWindow::makeGraph()
 {
-
-
-    this->bitDepth = (ui->cbDepth->itemData(ui->cbDepth->currentIndex()).toInt());
-
-
-
-    this->sampleRate = 44100;
-    double w = ( 2 *  M_PI)/sampleRate;
-    int frequency = ui->sbFreq->value();
-    int amplitude = ui->sbAmp->value();
-
-
-
-
-    szBuffer =  sampleRate * nChannel * this->bitDepth;
-
     if(buffer != NULL) {
         free(buffer);
     }
-    buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
 
-    if(buffer == NULL || buffer == 0) {       
-        return;
-    }
-
-    unsigned int j=0;
-    unsigned char *aux = NULL;
-
-    for(int i=0; i < sampleRate; i++ ) {
-
-        int x =  round(sin(  i * w   * frequency ) * (amplitude));
-
-
-
-        switch ( this->bitDepth) {
-            case 1:
-                aux = MathUtil::to8Le(x);
-                break;
-            case 2:
-                aux = MathUtil::to16Le(x);
-                break;
-            case 3:
-                aux = MathUtil::to24Le(x);
-                break;
-            case 4:                
-                aux = MathUtil::to32Le(x);
-                break;
-            default:
-                break;
-        }
-
-        for(int w=0; w < this->nChannel ; w++) {
-            memcpy(buffer+j, aux, this->bitDepth);
-            j += this->bitDepth;
-        }
-        if(aux != NULL)  {
-            free(aux);
-        }
-    }
-
+    this->buffer = graphDlg->getGraph();
+    this->bitDepth = graphDlg->getBitDepth();
+    this->nChannel = graphDlg->getNChannel();
+    this->sampleRate = graphDlg->getSampleRate();
+    this->szBuffer = sampleRate * bitDepth * nChannel;
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
-
     tela->repaint();
 }
 
@@ -214,17 +144,13 @@ void MainWindow::playSound()
 }
 
 void MainWindow::soundStatus()
-{
-    bool block;
+{    
     if(sound->isPlaying()) {
-        ui->btPlay->setText("Stop");
-        block = true;
+        ui->btPlay->setText("Stop");        
     }else {
         t->exit();
         ui->btPlay->setText("Play");
-        block = false;
-    }
-    setBlockGraphComponent(block);
+    }    
 }
 
 
@@ -233,7 +159,11 @@ void MainWindow::soundProgess(unsigned int value, double sec)
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }
 
-
+void MainWindow::openMakeGraph()
+{
+    graphDlg->setModal(true);
+    graphDlg->open();
+}
 
 void MainWindow::open()
 {
@@ -261,8 +191,6 @@ void MainWindow::acceptRawInfo()
         messageBox.critical(this,"Error","Cannot open the File!");
         messageBox.setFixedSize(500,200);
     }
-    setBlockGraphComponent(true);
-
 
     if(buffer != NULL) {
         free(buffer);
@@ -295,10 +223,4 @@ void MainWindow::save()
 }
 
 
-void MainWindow::setBlockGraphComponent(bool block)
-{
-    ui->cbDepth->setDisabled(block);
-    ui->sbAmp->setDisabled(block);
-    ui->sbFreq->setDisabled(block);
-    ui->sbSec->setDisabled(block);
-}
+
