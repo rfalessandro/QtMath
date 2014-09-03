@@ -19,6 +19,7 @@ AudioScene::AudioScene(QWidget *parent) :
     this->setVerticalScrollBarPolicy ( Qt::ScrollBarAlwaysOff );
 
     scene = new QGraphicsScene(this);
+    graphPoly = NULL;
     graph = NULL;
     ball = new Ball();
 
@@ -304,8 +305,12 @@ AudioScene::~AudioScene()
     timer->stop();
     delete timer;
     delete ball;
-    delete graph;
-    delete graphPoly;
+    if(graph != NULL) {
+        delete graph;
+    }
+    if(graphPoly != NULL) {
+        delete graphPoly;
+    }
     delete scene;
 }
 

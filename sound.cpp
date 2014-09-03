@@ -8,11 +8,17 @@ Sound::Sound()
 {
     sampleRate = 44100;
     nChannel = 2;
-    bitDepth = 2; 
+    bitDepth = 2;
     time = 1;
+
+    getPlaybackDeviceList();
 
 }
 
+void Sound::getPlaybackDeviceList()
+{
+
+}
 
 void Sound::setBitDepth(int bitDepth)
 {
@@ -83,10 +89,10 @@ void Sound::run() {
     /* Open PCM device for playback. */
     rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
-      str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
-      this->error = 1;
-      stop();
-      return;
+        str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
+        this->error = 1;
+        stop();
+        return;
     }
 
     QString info="";
@@ -103,18 +109,18 @@ void Sound::run() {
 
     /* Signed 16-bit little-endian format */
     switch(this->bitDepth ) {
-        case 4:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
-            break;
-        case 3:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
-            break;
-        case 2:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
-            break;
-        case 1:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
-            break;
+    case 4:
+        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
+        break;
+    case 3:
+        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
+        break;
+    case 2:
+        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
+        break;
+    case 1:
+        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
+        break;
 
     }
 
@@ -136,10 +142,10 @@ void Sound::run() {
     /* Write the parameters to the driver */
     rc = snd_pcm_hw_params(handle, params);
     if (rc < 0) {
-      str.sprintf("unable to set hw parameters: %s\n", snd_strerror(rc));
-      this->error =  -1;
-      stop();
-      return ;
+        str.sprintf("unable to set hw parameters: %s\n", snd_strerror(rc));
+        this->error =  -1;
+        stop();
+        return ;
     }
 
     /* Use a buffer large enough to hold one period */
@@ -219,5 +225,5 @@ void Sound::pause()
 
 void Sound::process()
 {
-  run();
+    run();
 }

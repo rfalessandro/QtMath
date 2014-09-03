@@ -19,6 +19,7 @@ private:
     unsigned int szBuffer;
     int error;
     bool playing;
+    void getPlaybackDeviceList();
 public:
     Sound();    
     void setTime(long time);
@@ -36,6 +37,8 @@ public:
     void pause();
     void stop();
     bool isPlaying();
+
+
 
 public slots:
     void process() ;
