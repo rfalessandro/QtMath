@@ -8,7 +8,7 @@ DialogMakeGraph::DialogMakeGraph(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
+    this->setWindowTitle("Make Graph");
     ui->cbDepth->addItem(" 8 Bits ",  1);
     ui->cbDepth->addItem(" 16 Bits ", 2);
     ui->cbDepth->addItem(" 24 Bits ", 3);

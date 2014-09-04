@@ -57,6 +57,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(t, SIGNAL(started()), sound, SLOT(process()));
     t->start();
 
+    const std::vector<QString> *lsDev = sound->getPlaybackList();
+    for (int i=0 ; i < lsDev->size() ; i++) {
+        ui->cbDevice->addItem(lsDev->at(i), lsDev->at(i));
+    }
 
     rawInfoDlg = new  RawInfoDialog(this);
     connect(rawInfoDlg, SIGNAL(accepted()), this, SLOT(acceptRawInfo()));
@@ -64,7 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
     graphDlg = new  DialogMakeGraph(this);
     connect(graphDlg, SIGNAL(accepted()), this, SLOT(makeGraph()));
 
+    szBuffer = 0;
     buffer = NULL;
+
     updateMain();
 }
 
@@ -125,21 +131,27 @@ void MainWindow::playSound()
         sound->stop();
         tela->stopAnimate();
     }else {
-        sound->setBuffer(buffer, szBuffer);
-        sound->setSampleRate(sampleRate);
-        sound->setBitDepth(this->bitDepth);
-        sound->setNChannel(nChannel);
-        sound->setTime(ui->sbSec->value() * 1000000);        
+        if(szBuffer > 0) {
+            sound->setBuffer(buffer, szBuffer);
+            sound->setSampleRate(sampleRate);
+            sound->setBitDepth(this->bitDepth);
+            sound->setNChannel(nChannel);
+            sound->setTime(ui->sbSec->value() * 1000000);
+            sound->setDeviceName(ui->cbDevice->itemData(ui->cbDevice->currentIndex()).toString().toStdString().c_str());
+            t->quit();
 
-        t->quit();
-
-        tela->setDx(0);
-        tela->setDy(0);
-        tela->setPointPos(0,0);
-        tela->animate(ui->sbSec->value() * 1000);
+            tela->setDx(0);
+            tela->setDy(0);
+            tela->setPointPos(0,0);
+            tela->animate(ui->sbSec->value() * 1000);
 
 
-        t->start();
+            t->start();
+        }else {
+            QMessageBox messageBox;
+            messageBox.information(this,"Info","No sound to play!");
+            messageBox.setFixedSize(500,200);
+        }
     }
 }
 

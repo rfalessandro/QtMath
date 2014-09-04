@@ -3,6 +3,9 @@
 
 #include <alsa/asoundlib.h>
 #include <QObject>
+#include <vector>
+
+using namespace std;
 
 class Sound : public QObject
 {
@@ -20,6 +23,8 @@ private:
     int error;
     bool playing;
     void getPlaybackDeviceList();
+    vector<QString> lsPcmPlayback;
+    char *deviceName;
 public:
     Sound();    
     void setTime(long time);
@@ -30,6 +35,7 @@ public:
     int getBitDepth();
     int getNChannel();
 
+    void setDeviceName(const char *deviceName);
     void setBuffer(unsigned const char *buffer, unsigned int szBuffer);
 
     long getTime();
@@ -38,7 +44,7 @@ public:
     void stop();
     bool isPlaying();
 
-
+    vector<QString> *getPlaybackList() const;
 
 public slots:
     void process() ;

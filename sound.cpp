@@ -2,7 +2,8 @@
 #include <alsa/asoundlib.h>
 #include <QString>
 #include <math.h>
-
+#include <QString>
+#include <QStringList>
 
 Sound::Sound()
 {
@@ -10,14 +11,48 @@ Sound::Sound()
     nChannel = 2;
     bitDepth = 2;
     time = 1;
-
+    deviceName = NULL;
+    szBuffer = 0;
+    setDeviceName("default");
     getPlaybackDeviceList();
 
 }
 
 void Sound::getPlaybackDeviceList()
 {
+    QString info("");
+    snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
 
+    void **hints, **n;
+    char *name, *descr, *io;
+    const char *filter;
+
+    if (snd_device_name_hint(-1, "pcm", &hints) < 0)
+        return;
+    n = hints;
+
+    filter = stream == SND_PCM_STREAM_CAPTURE ? "Input" : "Output";
+
+    io = NULL;
+    while (*n != NULL) {
+        name = snd_device_name_get_hint(*n, "NAME");
+        descr = snd_device_name_get_hint(*n, "DESC");
+        io = snd_device_name_get_hint(*n, "IOID");
+        if ((io == NULL || strcmp(io, filter) != 0 ) && strcmp("null", name) != 0)  {
+            QString str(name);
+                lsPcmPlayback.push_back(str.split(":").at(0));
+
+        }else {
+            if (name != NULL)
+                free(name);
+            if (descr != NULL)
+                free(descr);
+            if (io != NULL)
+                free(io);
+        }
+        n++;
+    }
+    snd_device_name_free_hint(hints);
 }
 
 void Sound::setBitDepth(int bitDepth)
@@ -40,6 +75,14 @@ void Sound::setTime(long time)
     this->time = time;
 }
 
+void Sound::setDeviceName(const char *deviceName)
+{
+    if(this->deviceName != NULL) {
+        free(this->deviceName);
+    }
+    this->deviceName = (char *) malloc(sizeof(char) * strlen(deviceName));
+    strcpy(this->deviceName, deviceName);
+}
 
 
 int Sound::getBitDepth()
@@ -87,7 +130,7 @@ void Sound::run() {
     unsigned int desloc;
 
     /* Open PCM device for playback. */
-    rc = snd_pcm_open(&handle, "default", SND_PCM_STREAM_PLAYBACK, 0);
+    rc = snd_pcm_open(&handle, this->deviceName, SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
         str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
         this->error = 1;
@@ -95,7 +138,6 @@ void Sound::run() {
         return;
     }
 
-    QString info="";
 
     /* Allocate a hardware parameters object. */
     snd_pcm_hw_params_alloca(&params);
@@ -226,4 +268,9 @@ void Sound::pause()
 void Sound::process()
 {
     run();
+}
+
+
+vector<QString> *Sound::getPlaybackList() const {
+    return (vector<QString> *)&lsPcmPlayback;
 }

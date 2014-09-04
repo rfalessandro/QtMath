@@ -13,6 +13,8 @@ RawInfoDialog::RawInfoDialog(QWidget *parent) :
     ui->cbFormat->addItem(" 24 Bits ", 3);
     ui->cbFormat->addItem(" 32 Bits ", 4);
     ui->cbFormat->setCurrentIndex(1);
+
+    this->setWindowTitle("Raw Info");
 }
 
 RawInfoDialog::~RawInfoDialog()
