@@ -49,8 +49,9 @@ void Sound::getPlaybackDeviceList()
                 free(descr);
             if (io != NULL)
                 free(io);
-        }
+        }        
         n++;
+
     }
     snd_device_name_free_hint(hints);
 }
@@ -80,8 +81,10 @@ void Sound::setDeviceName(const char *deviceName)
     if(this->deviceName != NULL) {
         free(this->deviceName);
     }
-    this->deviceName = (char *) malloc(sizeof(char) * strlen(deviceName));
+    int sz = strlen(deviceName) + 1;
+    this->deviceName = (char *) malloc(sizeof(char) * sz);
     strcpy(this->deviceName, deviceName);
+    this->deviceName[sz-1] = '\0';
 }
 
 
@@ -115,14 +118,13 @@ void Sound::setBuffer(unsigned const char *buffer, unsigned int sz)
 void Sound::run() {
     playing = true;
 
-    this->error = 0;
+
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
     long loops;
     int rc;
     int size;
-
 
     int dir;
     char *bufferToPlay;
@@ -132,8 +134,10 @@ void Sound::run() {
     /* Open PCM device for playback. */
     rc = snd_pcm_open(&handle, this->deviceName, SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
-        str.sprintf("unable to open pcm device: %s\n",   snd_strerror(rc));
-        this->error = 1;
+        str.sprintf("Unable to open pcm device: %s\n",   snd_strerror(rc));
+        snd_pcm_drain(handle);
+        snd_pcm_close(handle);
+        emit errorSignal(ERROR_OPEN_DEVICE, str.toStdString().c_str());
         stop();
         return;
     }
@@ -184,9 +188,20 @@ void Sound::run() {
     /* Write the parameters to the driver */
     rc = snd_pcm_hw_params(handle, params);
     if (rc < 0) {
-        str.sprintf("unable to set hw parameters: %s\n", snd_strerror(rc));
-        this->error =  -1;
+        const char *sndError = snd_strerror(rc);
+        char a[1024];
+
+        snprintf( (char *)&a, 1024, "Unable to set hardware parameters: %s \n", snd_strerror(rc) );
+
+
+
+        this->error =  str.toStdString().c_str();
+
+        snd_pcm_drain(handle);
+        snd_pcm_close(handle);
+        emit errorSignal(ERROR_PARAMS_DEVICE , (char *)a);
         stop();
+
         return ;
     }
 
@@ -210,9 +225,8 @@ void Sound::run() {
     emit startSound();
 
     while (it < loops  && playing) {
-
+        str.clear();
         memcpy(bufferToPlay, buffer+desloc, size);
-
         desloc += size;
         if(desloc > szBuffer ) {
             desloc = 0;//circular
@@ -229,13 +243,11 @@ void Sound::run() {
             str.sprintf("short write, write %d frames\n", rc);
         }
         it++;
-        emit progress(desloc, (((double)peridTime) * (double)it)/1000000.0);
+        emit progress(desloc, (((double)peridTime) * (double)it)/1000000.0, str.toStdString().c_str());
     }
-    printf("%s\n", str.toStdString().c_str());
     snd_pcm_drain(handle);
     snd_pcm_close(handle);
     free(bufferToPlay);
-    this->error =  0;
     stop();
     return;
 }
@@ -244,6 +256,7 @@ void Sound::run() {
 
 void Sound::play()
 {
+    this->error = NULL;
     run();
 }
 

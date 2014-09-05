@@ -50,7 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
     sound = new Sound;
     connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
-    connect(this->sound, SIGNAL(progress(unsigned int, double)), this, SLOT(soundProgess(unsigned int, double)));
+    connect(this->sound, SIGNAL(errorSignal(int, const char*)), this, SLOT(soundError(int, const char *)));
+    connect(this->sound, SIGNAL(progress(unsigned int, double, const char *)), this, SLOT(soundProgess(unsigned int, double, const char *)));
     t = new QThread;
 
     sound->moveToThread(t);
@@ -155,6 +156,25 @@ void MainWindow::playSound()
     }
 }
 
+void MainWindow::soundError(int errorType, const char *errorStr)
+{
+
+    QMessageBox messageBox;
+    messageBox.setFixedSize(500,200);
+    switch (errorType) {
+        case Sound::ERROR_OPEN_DEVICE:
+        case Sound::ERROR_PARAMS_DEVICE:
+            tela->stopAnimate();
+            messageBox.critical(this,"Error", errorStr);
+            break;
+        default:
+            messageBox.critical(this,"Error", "Error while playing");
+            break;
+    }
+
+
+
+}
 void MainWindow::soundStatus()
 {    
     if(sound->isPlaying()) {
@@ -166,7 +186,7 @@ void MainWindow::soundStatus()
 }
 
 
-void MainWindow::soundProgess(unsigned int value, double sec)
+void MainWindow::soundProgess(unsigned int value, double sec, const char *)
 {
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }

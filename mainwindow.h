@@ -44,8 +44,9 @@ private slots:
     void playSound();
     void makeGraph();
     void updateFrame();
+    void soundError(int errorType, const char *errorStr);
     void soundStatus();
-    void soundProgess(unsigned int value, double sec);
+    void soundProgess(unsigned int value, double sec, const char *);
     void acceptRawInfo();
 };
 
