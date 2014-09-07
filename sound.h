@@ -24,12 +24,13 @@ private:
     bool playing;
     void getPlaybackDeviceList();
     vector<QString> lsPcmPlayback;
+    vector<QString> lsPcmCapture;
     char *deviceName;
 public:
     Sound();    
     static const int ERROR_OPEN_DEVICE = 1;
     static const int ERROR_PARAMS_DEVICE = 2;
-    const char *error;
+    string *error;
     void setTime(long time);
     void setSampleRate(int sampleRate);
     void setBitDepth(int depth);
@@ -54,8 +55,8 @@ public slots:
 signals:
     void stopSound();
     void startSound();
-    void progress(unsigned int value, double sec, const char *info);
-    void errorSignal(int, const char *);
+    void progress(unsigned int value, double sec, const char  *info);
+    void errorSignal(int type, const QString &errorStr);
 
 };
 

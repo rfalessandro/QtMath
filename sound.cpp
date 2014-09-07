@@ -20,27 +20,28 @@ Sound::Sound()
 
 void Sound::getPlaybackDeviceList()
 {
-    QString info("");
-    snd_pcm_stream_t stream = SND_PCM_STREAM_PLAYBACK;
-
     void **hints, **n;
     char *name, *descr, *io;
-    const char *filter;
 
     if (snd_device_name_hint(-1, "pcm", &hints) < 0)
         return;
     n = hints;
 
-    filter = stream == SND_PCM_STREAM_CAPTURE ? "Input" : "Output";
 
     io = NULL;
     while (*n != NULL) {
         name = snd_device_name_get_hint(*n, "NAME");
         descr = snd_device_name_get_hint(*n, "DESC");
         io = snd_device_name_get_hint(*n, "IOID");
-        if ((io == NULL || strcmp(io, filter) != 0 ) && strcmp("null", name) != 0)  {
-            QString str(name);
-                lsPcmPlayback.push_back(str.split(":").at(0));
+        if (strcmp("null", name) != 0)  {
+            if(io == NULL) {
+                lsPcmPlayback.push_back(QString(name));
+                lsPcmCapture.push_back(QString(name));
+            }else if(strcmp(io, "Output") == 0) {
+                lsPcmPlayback.push_back(QString(name));
+            }else if(strcmp(io, "Input") == 0) {
+                lsPcmCapture.push_back(QString(name));
+            }
 
         }else {
             if (name != NULL)
@@ -134,10 +135,12 @@ void Sound::run() {
     /* Open PCM device for playback. */
     rc = snd_pcm_open(&handle, this->deviceName, SND_PCM_STREAM_PLAYBACK, 0);
     if (rc < 0) {
-        str.sprintf("Unable to open pcm device: %s\n",   snd_strerror(rc));
-        snd_pcm_drain(handle);
-        snd_pcm_close(handle);
-        emit errorSignal(ERROR_OPEN_DEVICE, str.toStdString().c_str());
+        QString strError("Unable to open pcm device: ");
+        strError.append(snd_strerror(rc));
+
+        //snd_pcm_drain(handle);
+        //snd_pcm_close(handle);
+        emit errorSignal(ERROR_OPEN_DEVICE, strError);
         stop();
         return;
     }
@@ -188,20 +191,12 @@ void Sound::run() {
     /* Write the parameters to the driver */
     rc = snd_pcm_hw_params(handle, params);
     if (rc < 0) {
-        const char *sndError = snd_strerror(rc);
-        char a[1024];
-
-        snprintf( (char *)&a, 1024, "Unable to set hardware parameters: %s \n", snd_strerror(rc) );
-
-
-
-        this->error =  str.toStdString().c_str();
-
-        snd_pcm_drain(handle);
-        snd_pcm_close(handle);
-        emit errorSignal(ERROR_PARAMS_DEVICE , (char *)a);
+        QString strError("Unable to set hardware parameters: ");
+        strError.append(snd_strerror(rc));
+        //snd_pcm_drain(handle);
+        //snd_pcm_close(handle);
+        emit errorSignal(ERROR_PARAMS_DEVICE , strError);
         stop();
-
         return ;
     }
 

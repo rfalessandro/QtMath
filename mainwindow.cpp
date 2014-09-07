@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sound = new Sound;
     connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
-    connect(this->sound, SIGNAL(errorSignal(int, const char*)), this, SLOT(soundError(int, const char *)));
+    connect(this->sound, SIGNAL(errorSignal(int, const QString &)), this, SLOT(soundError(int, const QString &)));
     connect(this->sound, SIGNAL(progress(unsigned int, double, const char *)), this, SLOT(soundProgess(unsigned int, double, const char *)));
     t = new QThread;
 
@@ -59,8 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     t->start();
 
     const std::vector<QString> *lsDev = sound->getPlaybackList();
-    for (int i=0 ; i < lsDev->size() ; i++) {
-        ui->cbDevice->addItem(lsDev->at(i), lsDev->at(i));
+    for (unsigned int i=0 ; i < lsDev->size() ; i++) {
+        QString aux = lsDev->at(i);
+        ui->cbDevice->addItem(aux.split(":").at(0), aux );
     }
 
     rawInfoDlg = new  RawInfoDialog(this);
@@ -156,7 +157,7 @@ void MainWindow::playSound()
     }
 }
 
-void MainWindow::soundError(int errorType, const char *errorStr)
+void MainWindow::soundError(int errorType, const QString &errorStr)
 {
 
     QMessageBox messageBox;

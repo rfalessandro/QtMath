@@ -11,6 +11,8 @@ namespace Ui {
 class MainWindow;
 }
 
+using namespace std;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -44,7 +46,7 @@ private slots:
     void playSound();
     void makeGraph();
     void updateFrame();
-    void soundError(int errorType, const char *errorStr);
+    void soundError(int errorType, const QString &errorStr);
     void soundStatus();
     void soundProgess(unsigned int value, double sec, const char *);
     void acceptRawInfo();
