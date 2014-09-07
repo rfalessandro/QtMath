@@ -13,7 +13,7 @@ Sound::Sound()
     time = 1;
     deviceName = NULL;
     szBuffer = 0;
-    capture = false;
+    capturing = false;
     playing = false;
     setDeviceName("default");
     getPlaybackDeviceList();
@@ -112,7 +112,7 @@ long Sound::getTime()
 }
 
 
-void Sound::setBuffer(unsigned const char *buffer, unsigned int sz)
+void Sound::setBuffer(unsigned char *buffer, unsigned int sz)
 {
     this->buffer = buffer;
     this->szBuffer = sz;
@@ -134,7 +134,7 @@ void Sound::run() {
 
 
     /* Open PCM device for playback. */
-    rc = snd_pcm_open(&handle, this->deviceName, SND_PCM_STREAM_PLAYBACK, 0);
+    rc = snd_pcm_open(&handle, this->deviceName, (isCapture() ? SND_PCM_STREAM_CAPTURE : SND_PCM_STREAM_PLAYBACK), 0);
     if (rc < 0) {
         QString strError("Unable to open pcm device: ");
         strError.append(snd_strerror(rc));
@@ -146,44 +146,41 @@ void Sound::run() {
 
     /* Allocate a hardware parameters object. */
     snd_pcm_hw_params_alloca(&params);
+
     /* Fill it in with default values. */
-    snd_pcm_hw_params_any(handle, params);
+    rc = snd_pcm_hw_params_any(handle, params);
 
     /* Set the desired hardware parameters. */
     /* Interleaved mode */
-    snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+    rc = snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
 
 
-    /* Signed 16-bit little-endian format */
     switch(this->bitDepth ) {
-    case 4:
-        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
-        break;
-    case 3:
-        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
-        break;
-    case 2:
-        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
-        break;
-    case 1:
-        snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
-        break;
+        case 4:
+            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
+            break;
+        case 3:
+            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
+            break;
+        case 2:
+            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
+            break;
+        case 1:
+            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
+            break;
 
     }
 
+    rc = snd_pcm_hw_params_set_channels(handle, params, this->nChannel);
 
-    /* Two channels (stereo) */
-    snd_pcm_hw_params_set_channels(handle, params, this->nChannel);
-
-    /* 44100 bits/second sampling rate (CD quality) */
     unsigned int rate = this->sampleRate;
-    snd_pcm_hw_params_set_rate_near(handle, params, &rate, &dir);
+    rc = snd_pcm_hw_params_set_rate_near(handle, params, &rate, &dir);
 
 
 
     /* Set period size to 32 frames. */
     frames = 32;
-    snd_pcm_hw_params_set_period_size_near(handle, params, &frames, &dir);
+   rc =  snd_pcm_hw_params_set_period_size_near(handle, params, &frames, &dir);
 
 
     /* Write the parameters to the driver */
@@ -199,7 +196,7 @@ void Sound::run() {
     }
 
     /* Use a buffer large enough to hold one period */
-    snd_pcm_hw_params_get_period_size(params, &frames,&dir);
+    rc = snd_pcm_hw_params_get_period_size(params, &frames,&dir);
 
     size = frames * this->nChannel * this->bitDepth;
     bufferToPlay = (char *) malloc(size);
@@ -207,7 +204,7 @@ void Sound::run() {
 
     unsigned int peridTime;
 
-    snd_pcm_hw_params_get_period_time(params,&peridTime, &dir);
+    rc = snd_pcm_hw_params_get_period_time(params,&peridTime, &dir);
 
 
     desloc = 0;
@@ -217,13 +214,24 @@ void Sound::run() {
 
     while (it < loops  && playing) {
         str.clear();
-        memcpy(bufferToPlay, buffer+desloc, size);
-        desloc += size;
-        if(desloc > szBuffer ) {
-            desloc = 0;//circular
-        }
 
-        rc = snd_pcm_writei(handle, bufferToPlay, frames);
+        if(!isCapture()) {
+            memcpy(bufferToPlay, buffer+desloc, size);
+            desloc += size;
+            if(desloc > szBuffer ) {
+                desloc = 0;//circular
+            }
+
+            rc = snd_pcm_writei(handle, bufferToPlay, frames);
+        }else {
+
+            rc = snd_pcm_readi(handle, bufferToPlay, frames);
+            memcpy(buffer+desloc, bufferToPlay, size);
+            desloc += size;
+            if(desloc > szBuffer ) {
+                break;
+            }
+        }
         if (rc == -EPIPE) {
             /* EPIPE means underrun */
             str.sprintf( "underrun occurred\n");
@@ -248,6 +256,14 @@ void Sound::run() {
 void Sound::play()
 {
     this->error = NULL;
+    capturing = false;
+    run();
+}
+
+void Sound::capture()
+{
+    this->error = NULL;
+    capturing = true;
     run();
 }
 
@@ -266,7 +282,7 @@ bool Sound::isPlaying()
 
 bool Sound::isCapture()
 {
-    return capture;
+    return capturing;
 }
 
 void Sound::pause()
@@ -279,6 +295,15 @@ void Sound::process()
     run();
 }
 
+void Sound::setCaptureMode()
+{
+    this->capturing = true;
+}
+
+void Sound::setPlayMode()
+{
+    this->capturing = false;
+}
 
 vector<QString> *Sound::getPlaybackList() const {
     return (vector<QString> *)&lsPcmPlayback;
@@ -286,3 +311,4 @@ vector<QString> *Sound::getPlaybackList() const {
 vector<QString> *Sound::getCaptureList() const {
     return (vector<QString> *)&lsPcmCapture;
 }
+

@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     sound->moveToThread(threadSound);
     connect(threadSound, SIGNAL(started()), sound, SLOT(process()));
-    threadSound->start();
+
 
     const std::vector<QString> *lsDev = sound->getPlaybackList();
     for (unsigned int i=0 ; i < lsDev->size() ; i++) {
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     szBuffer = 0;
     buffer = NULL;
-
+    sampleRate = 44100;
 
     ui->cbFormat->addItem(" 8 Bits ",  1);
     ui->cbFormat->addItem(" 16 Bits ", 2);
@@ -147,13 +147,14 @@ void MainWindow::playSound()
         tela->stopAnimate();
     }else {
         if(szBuffer > 0) {
+            threadSound->quit();
             sound->setBuffer(buffer, szBuffer);
             sound->setSampleRate(sampleRate);
             sound->setBitDepth(this->bitDepth);
             sound->setNChannel(nChannel);
             sound->setTime(ui->sbSec->value() * 1000000);
             sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
-            threadSound->quit();
+            sound->setPlayMode();
 
             tela->setDx(0);
             tela->setDy(0);
@@ -195,6 +196,9 @@ void MainWindow::soundStatus()
         ui->btPlay->setText("Stop");        
     }else {
         threadSound->exit();
+        if(sound->isCapture()) {
+            updateSoundInfo();
+        }
         ui->btPlay->setText("Play");
     }    
 }
@@ -277,7 +281,7 @@ void MainWindow::updateSoundInfo()
     ui->sbNChannel->setValue(this->nChannel);
     ui->cbFormat->setCurrentIndex(ui->cbFormat->findData(this->bitDepth));
 
-    ui->btRecord->setDisabled(true);
+    changeDevice();
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
     tela->repaint();
@@ -301,6 +305,7 @@ void MainWindow::changeDevice()
 
 void MainWindow::recordSound()
 {
+    this->sampleRate = 44100;
     this->nChannel = ui->sbNChannel->value();
     this->bitDepth = ui->cbFormat->currentData().toInt();
 
@@ -309,12 +314,14 @@ void MainWindow::recordSound()
         free(buffer);
     }
     buffer = (unsigned char *)calloc(sizeof(unsigned char), szBuffer);
+    threadSound->quit();
     sound->setBuffer(buffer, szBuffer);
     sound->setSampleRate(sampleRate);
-    sound->setBitDepth(this->bitDepth);
+    sound->setBitDepth(bitDepth);
     sound->setNChannel(nChannel);
     sound->setTime(ui->sbSec->value() * 1000000);
     sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
-    threadSound->quit();
+    sound->setCaptureMode();
+
     threadSound->start();
 }

@@ -18,9 +18,9 @@ private:
     int bitDepth;
     int nChannel;
     long time;
-    unsigned const char *buffer;
+    unsigned char *buffer;
     unsigned int szBuffer;
-    bool capture;
+    bool capturing;
     bool playing;
     void getPlaybackDeviceList();
     vector<QString> lsPcmPlayback;
@@ -40,10 +40,12 @@ public:
     int getNChannel();
 
     void setDeviceName(const char *deviceName);
-    void setBuffer(unsigned const char *buffer, unsigned int szBuffer);
-
+    void setBuffer(unsigned char *buffer, unsigned int szBuffer);
+    void setCaptureMode();
+    void setPlayMode();
     long getTime();
     void play();
+    void capture();
     void pause();
     void stop();
     bool isPlaying();
