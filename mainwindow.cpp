@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->vlFrame->addWidget((QWidget *)this->tela);
 
 
+    ui->btRecord->setDisabled(true);
 
     tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     tela->setLineColor(QColor(0xF4, 0xAC, 0x50, 0x70));
@@ -72,6 +73,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     szBuffer = 0;
     buffer = NULL;
+
+
+    ui->cbFormat->addItem(" 8 Bits ",  1);
+    ui->cbFormat->addItem(" 16 Bits ", 2);
+    ui->cbFormat->addItem(" 24 Bits ", 3);
+    ui->cbFormat->addItem(" 32 Bits ", 4);
+    ui->cbFormat->setCurrentIndex(1);
+
+
+
+
+
 
     updateMain();
 }
@@ -123,8 +136,8 @@ void MainWindow::makeGraph()
     this->sampleRate = graphDlg->getSampleRate();
     this->szBuffer = sampleRate * bitDepth * nChannel;
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
-    tela->repaint();
+
+    updateSoundInfo();
 }
 
 void MainWindow::playSound()
@@ -236,9 +249,11 @@ void MainWindow::acceptRawInfo()
     this->bitDepth = rawInfoDlg->getBitDepth();
     this->sampleRate = rawInfoDlg->getSampleRate();
     this->nChannel = rawInfoDlg->getNChannel();
+    updateSoundInfo();
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
-    tela->repaint();
+
+
+
 
 }
 
@@ -257,3 +272,14 @@ void MainWindow::save()
 
 
 
+void MainWindow::updateSoundInfo()
+{
+    ui->sbNChannel->setValue(this->nChannel);
+    ui->cbFormat->setCurrentIndex(ui->cbFormat->findData(this->bitDepth));
+
+    ui->btRecord->setDisabled(true);
+
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+    tela->repaint();
+
+}

@@ -137,9 +137,6 @@ void Sound::run() {
     if (rc < 0) {
         QString strError("Unable to open pcm device: ");
         strError.append(snd_strerror(rc));
-
-        //snd_pcm_drain(handle);
-        //snd_pcm_close(handle);
         emit errorSignal(ERROR_OPEN_DEVICE, strError);
         stop();
         return;
@@ -193,8 +190,8 @@ void Sound::run() {
     if (rc < 0) {
         QString strError("Unable to set hardware parameters: ");
         strError.append(snd_strerror(rc));
-        //snd_pcm_drain(handle);
-        //snd_pcm_close(handle);
+        snd_pcm_drain(handle);
+        snd_pcm_close(handle);
         emit errorSignal(ERROR_PARAMS_DEVICE , strError);
         stop();
         return ;

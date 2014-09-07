@@ -36,7 +36,7 @@ private:
     int bitDepth;
     RawInfoDialog *rawInfoDlg;
     DialogMakeGraph *graphDlg;
-
+    void updateSoundInfo();
 private slots:
     void open();
     void openMakeGraph();
