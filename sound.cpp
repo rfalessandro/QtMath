@@ -226,7 +226,11 @@ void Sound::run() {
         }else {
 
             rc = snd_pcm_readi(handle, bufferToPlay, frames);
-            memcpy(buffer+desloc, bufferToPlay, size);
+            if(desloc + size > szBuffer) {
+                 memcpy(buffer+desloc, bufferToPlay, szBuffer - desloc);
+            }else {
+                memcpy(buffer+desloc, bufferToPlay, size);
+            }
             desloc += size;
             if(desloc > szBuffer ) {
                 break;
