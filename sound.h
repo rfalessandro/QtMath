@@ -20,7 +20,7 @@ private:
     long time;
     unsigned const char *buffer;
     unsigned int szBuffer;
-
+    bool capture;
     bool playing;
     void getPlaybackDeviceList();
     vector<QString> lsPcmPlayback;
@@ -47,8 +47,9 @@ public:
     void pause();
     void stop();
     bool isPlaying();
-
+    bool isCapture();
     vector<QString> *getPlaybackList() const;
+    vector<QString> *getCaptureList() const;
 
 public slots:
     void process() ;

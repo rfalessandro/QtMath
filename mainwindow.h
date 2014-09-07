@@ -27,7 +27,7 @@ public:
 private:
     Ui::MainWindow *ui;
     AudioScene *tela;
-    QThread *t;
+    QThread *threadSound;
     Sound *sound;
     unsigned char *buffer;
     unsigned int szBuffer;
@@ -43,6 +43,7 @@ private slots:
     void save();
     void recalc();
     void updateMain();
+    void recordSound();
     void playSound();
     void makeGraph();
     void updateFrame();
@@ -50,6 +51,7 @@ private slots:
     void soundStatus();
     void soundProgess(unsigned int value, double sec, const char *);
     void acceptRawInfo();
+    void changeDevice();
 };
 
 

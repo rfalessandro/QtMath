@@ -2,11 +2,14 @@
 <ui version="4.0">
  <class>RawInfoDialog</class>
  <widget class="QDialog" name="RawInfoDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>272</width>
+    <width>300</width>
     <height>170</height>
    </rect>
   </property>
@@ -18,13 +21,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>272</width>
+    <width>300</width>
     <height>170</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>272</width>
+    <width>300</width>
     <height>170</height>
    </size>
   </property>
@@ -53,10 +56,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>20</y>
-     <width>91</width>
-     <height>16</height>
+     <width>121</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -72,10 +75,10 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>50</y>
-     <width>91</width>
-     <height>16</height>
+     <width>121</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -91,10 +94,10 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>80</y>
-     <width>91</width>
-     <height>16</height>
+     <width>121</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -110,7 +113,7 @@
   <widget class="QSpinBox" name="sbNChannel">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>150</x>
      <y>50</y>
      <width>111</width>
      <height>23</height>
@@ -123,7 +126,7 @@
   <widget class="QLineEdit" name="txtSampleRate">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>150</x>
      <y>80</y>
      <width>113</width>
      <height>22</height>
@@ -139,7 +142,7 @@
   <widget class="QComboBox" name="cbFormat">
    <property name="geometry">
     <rect>
-     <x>120</x>
+     <x>150</x>
      <y>20</y>
      <width>111</width>
      <height>22</height>

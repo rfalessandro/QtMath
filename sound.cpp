@@ -13,6 +13,8 @@ Sound::Sound()
     time = 1;
     deviceName = NULL;
     szBuffer = 0;
+    capture = false;
+    playing = false;
     setDeviceName("default");
     getPlaybackDeviceList();
 
@@ -118,8 +120,6 @@ void Sound::setBuffer(unsigned const char *buffer, unsigned int sz)
 
 void Sound::run() {
     playing = true;
-
-
     snd_pcm_t *handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
@@ -131,6 +131,7 @@ void Sound::run() {
     char *bufferToPlay;
     QString str = "";
     unsigned int desloc;
+
 
     /* Open PCM device for playback. */
     rc = snd_pcm_open(&handle, this->deviceName, SND_PCM_STREAM_PLAYBACK, 0);
@@ -200,8 +201,6 @@ void Sound::run() {
     /* Use a buffer large enough to hold one period */
     snd_pcm_hw_params_get_period_size(params, &frames,&dir);
 
-
-
     size = frames * this->nChannel * this->bitDepth;
     bufferToPlay = (char *) malloc(size);
 
@@ -265,6 +264,11 @@ bool Sound::isPlaying()
     return playing;
 }
 
+bool Sound::isCapture()
+{
+    return capture;
+}
+
 void Sound::pause()
 {
     return ;
@@ -278,4 +282,7 @@ void Sound::process()
 
 vector<QString> *Sound::getPlaybackList() const {
     return (vector<QString> *)&lsPcmPlayback;
+}
+vector<QString> *Sound::getCaptureList() const {
+    return (vector<QString> *)&lsPcmCapture;
 }

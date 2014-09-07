@@ -39,25 +39,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->btRecalc, SIGNAL(released()), this, SLOT(recalc()));
     connect(tela, SIGNAL(valueChanged()), this, SLOT(updateMain()));
     connect(ui->btPlay, SIGNAL(released()), this, SLOT(playSound()));
-
+    connect(ui->btRecord, SIGNAL(released()), this, SLOT(recordSound()));
     connect(ui->sbDx, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbDy, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
     connect(ui->sbZoom, SIGNAL(valueChanged(double)), this, SLOT(updateFrame()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(save()));
     connect(ui->actionSin, SIGNAL(triggered()), this, SLOT(openMakeGraph()));
-
+    connect(ui->cbDevice, SIGNAL(currentIndexChanged(int)), this, SLOT(changeDevice()));
 
     sound = new Sound;
     connect(this->sound, SIGNAL(startSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(stopSound()), this, SLOT(soundStatus()));
     connect(this->sound, SIGNAL(errorSignal(int, const QString &)), this, SLOT(soundError(int, const QString &)));
     connect(this->sound, SIGNAL(progress(unsigned int, double, const char *)), this, SLOT(soundProgess(unsigned int, double, const char *)));
-    t = new QThread;
+    threadSound = new QThread;
 
-    sound->moveToThread(t);
-    connect(t, SIGNAL(started()), sound, SLOT(process()));
-    t->start();
+    sound->moveToThread(threadSound);
+    connect(threadSound, SIGNAL(started()), sound, SLOT(process()));
+    threadSound->start();
 
     const std::vector<QString> *lsDev = sound->getPlaybackList();
     for (unsigned int i=0 ; i < lsDev->size() ; i++) {
@@ -95,8 +95,8 @@ MainWindow::~MainWindow()
     if(buffer != NULL) {
         free(buffer);
     }
-    t->exit();    
-    delete t;
+    threadSound->exit();
+    delete threadSound;
     delete sound;
     delete tela;
     delete ui;
@@ -152,8 +152,8 @@ void MainWindow::playSound()
             sound->setBitDepth(this->bitDepth);
             sound->setNChannel(nChannel);
             sound->setTime(ui->sbSec->value() * 1000000);
-            sound->setDeviceName(ui->cbDevice->itemData(ui->cbDevice->currentIndex()).toString().toStdString().c_str());
-            t->quit();
+            sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
+            threadSound->quit();
 
             tela->setDx(0);
             tela->setDy(0);
@@ -161,7 +161,7 @@ void MainWindow::playSound()
             tela->animate(ui->sbSec->value() * 1000);
 
 
-            t->start();
+            threadSound->start();
         }else {
             QMessageBox messageBox;
             messageBox.information(this,"Info","No sound to play!");
@@ -194,7 +194,7 @@ void MainWindow::soundStatus()
     if(sound->isPlaying()) {
         ui->btPlay->setText("Stop");        
     }else {
-        t->exit();
+        threadSound->exit();
         ui->btPlay->setText("Play");
     }    
 }
@@ -282,4 +282,39 @@ void MainWindow::updateSoundInfo()
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
     tela->repaint();
 
+}
+
+
+void MainWindow::changeDevice()
+{
+    ui->btRecord->setDisabled(true);
+    QString dev = ui->cbDevice->currentData().toString();
+    const vector<QString> *lsCap = sound->getCaptureList();
+    for(unsigned int i = 0 ; i < lsCap->size() ; i++) {
+        if(lsCap->at(i) == dev) {
+            ui->btRecord->setDisabled(false);
+            break;
+        }
+    }
+}
+
+
+void MainWindow::recordSound()
+{
+    this->nChannel = ui->sbNChannel->value();
+    this->bitDepth = ui->cbFormat->currentData().toInt();
+
+    szBuffer = this->sampleRate * ui->sbSec->value() * this->nChannel * this->bitDepth;
+    if(buffer == NULL) {
+        free(buffer);
+    }
+    buffer = (unsigned char *)calloc(sizeof(unsigned char), szBuffer);
+    sound->setBuffer(buffer, szBuffer);
+    sound->setSampleRate(sampleRate);
+    sound->setBitDepth(this->bitDepth);
+    sound->setNChannel(nChannel);
+    sound->setTime(ui->sbSec->value() * 1000000);
+    sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
+    threadSound->quit();
+    threadSound->start();
 }
