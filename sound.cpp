@@ -130,7 +130,7 @@ void Sound::run() {
     int dir;
     char *bufferToPlay;
     QString str = "";
-    unsigned int desloc;
+    int desloc = 0;
 
 
     /* Open PCM device for playback. */
@@ -157,20 +157,28 @@ void Sound::run() {
 
     switch(this->bitDepth ) {
         case 4:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
+            rc = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S32_LE);
             break;
         case 3:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
+            rc = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S24_LE);
             break;
         case 2:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
+            rc = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S16_LE);
             break;
         case 1:
-            snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
+            rc = snd_pcm_hw_params_set_format(handle, params, SND_PCM_FORMAT_S8);
             break;
 
     }
-
+    if(rc < 0) {
+        QString strError("Unable to set bit depth in this pcm device: ");
+        strError.append(snd_strerror(rc));
+        snd_pcm_drain(handle);
+        snd_pcm_close(handle);
+        emit errorSignal(ERROR_PARAMS_DEVICE, strError);
+        stop();
+        return;
+    }
     rc = snd_pcm_hw_params_set_channels(handle, params, this->nChannel);
 
     unsigned int rate = this->sampleRate;
@@ -179,7 +187,7 @@ void Sound::run() {
 
 
     /* Set period size to 32 frames. */
-    frames = 32;
+   frames = 32;
    rc =  snd_pcm_hw_params_set_period_size_near(handle, params, &frames, &dir);
 
 
@@ -199,7 +207,7 @@ void Sound::run() {
     rc = snd_pcm_hw_params_get_period_size(params, &frames,&dir);
 
     size = frames * this->nChannel * this->bitDepth;
-    bufferToPlay = (char *) malloc(size);
+    bufferToPlay = (char *) calloc(sizeof(char), size);
 
 
     unsigned int peridTime;
@@ -214,25 +222,24 @@ void Sound::run() {
 
     while (it < loops  && playing) {
         str.clear();
-
         if(!isCapture()) {
+            //playback
             memcpy(bufferToPlay, buffer+desloc, size);
             desloc += size;
-            if(desloc > szBuffer ) {
+            if(desloc >= szBuffer ) {
                 desloc = 0;//circular
             }
-
             rc = snd_pcm_writei(handle, bufferToPlay, frames);
         }else {
-
+            //capture
             rc = snd_pcm_readi(handle, bufferToPlay, frames);
-            if(desloc + size > szBuffer) {
-                 memcpy(buffer+desloc, bufferToPlay, szBuffer - desloc);
+            if(desloc + size >= szBuffer) {
+                memcpy(buffer+desloc, bufferToPlay, szBuffer - desloc);
             }else {
                 memcpy(buffer+desloc, bufferToPlay, size);
             }
             desloc += size;
-            if(desloc > szBuffer ) {
+            if(desloc >= szBuffer ) {
                 break;
             }
         }
@@ -245,6 +252,7 @@ void Sound::run() {
         }  else if (rc != (int)frames) {
             str.sprintf("short write, write %d frames\n", rc);
         }
+    //    rc = write(1, bufferToPlay, size);
         it++;
         emit progress(desloc, (((double)peridTime) * (double)it)/1000000.0, str.toStdString().c_str());
     }
