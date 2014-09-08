@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    setWindowTitle("QtMath");
     tela = new AudioScene;
 
     ui->vlFrame->addWidget((QWidget *)this->tela);
