@@ -60,10 +60,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     const std::vector<QString> *lsDev = sound->getPlaybackList();
+    int index = 0;
     for (unsigned int i=0 ; i < lsDev->size() ; i++) {
         QString aux = lsDev->at(i);
+        if(aux.contains("default:")) {
+            index = i;
+        }
         ui->cbDevice->addItem(aux.split(":").at(0), aux );
+
     }
+
+    ui->cbDevice->setCurrentIndex(index);
 
     rawInfoDlg = new  RawInfoDialog(this);
     connect(rawInfoDlg, SIGNAL(accepted()), this, SLOT(acceptRawInfo()));
