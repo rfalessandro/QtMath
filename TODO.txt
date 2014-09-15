@@ -1,0 +1,18 @@
+Record
+	Choose other device to Record
+	Graph on-the-fly 
+	Record and Play together
+
+Graphs
+	Frequency x Time
+	Amplitude x Frequency
+
+Filters
+	Low Filter
+	Hight Filter
+	Band Filter	
+	Noise filter
+
+
+
+	
