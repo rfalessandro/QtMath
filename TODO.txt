@@ -1,11 +1,20 @@
+Main
+	Split in channels
+	
+
 Record
 	Choose other device to Record
 	Graph on-the-fly 
 	Record and Play together
 
 Graphs
+	Sawtooth
+	Square
+	Harmonic		
 	Frequency x Time
 	Amplitude x Frequency
+	FFT
+	
 
 Filters
 	Low Filter

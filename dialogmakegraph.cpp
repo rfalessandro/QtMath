@@ -45,7 +45,6 @@ unsigned char  *DialogMakeGraph::getGraph()
     unsigned char *aux = NULL;
 
     for(int i=0; i < sampleRate; i++ ) {
-
         int y =  round(sin(  i * w   * frequency ) * (amplitude));
         switch (bitDepth) {
             case 1:
