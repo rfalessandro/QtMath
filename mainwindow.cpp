@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <complex.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -87,11 +88,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cbFormat->addItem(" 24 Bits ", 3);
     ui->cbFormat->addItem(" 32 Bits ", 4);
     ui->cbFormat->setCurrentIndex(1);
-
-
-
-
-
 
     updateMain();
 }
@@ -293,6 +289,12 @@ void MainWindow::updateSoundInfo()
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
     tela->repaint();
 
+    cplx *buf = MathUtil::fft(buffer, szBuffer, nChannel, bitDepth);
+    for (int i = 0; i < sampleRate; i++)
+            if (!cimag(buf[i]))
+                printf("%g ", creal(buf[i]));
+            else
+                printf("(%g, %g) ", creal(buf[i]), cimag(buf[i]));
 }
 
 

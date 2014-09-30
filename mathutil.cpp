@@ -1,6 +1,7 @@
 #include "mathutil.h"
 #include <stdlib.h>
 
+
 MathUtil::MathUtil()
 {
 
@@ -92,5 +93,50 @@ int8_t MathUtil::to8Le(const unsigned char *arr, int pos)
         return ( (  (0x000000FF & arr[pos + 0]) << 0)  );
     }
     return 0;
+}
+
+void MathUtil::_fft(cplx buf[], cplx out[], int n, int step)
+{
+    if (step < n) {
+        _fft(out, buf, n, step * 2);
+        _fft(out + step, buf + step, n, step * 2);
+
+        for (int i = 0; i < n; i += 2 * step) {
+            cplx t = cexp(-I * M_PI * i / n) * out[i + step];
+            buf[i / 2]     = out[i] + t;
+            buf[(i + n)/2] = out[i] - t;
+        }
+    }
+}
+
+cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, int bitDepth) {
+    cplx out[n];
+    cplx *buf = (cplx *)calloc(sizeof(cplx), n);
+    unsigned int i = 0,j = 0;
+    for (i = 0; j < n; i++) {
+        int value = 0;
+        switch (bitDepth) {
+            case 1:
+                value = to8Le(buffer, j);
+                break;
+            case 2:
+                value = to16Le(buffer, j);
+                break;
+            case 3:
+                value = to24Le(buffer, j);
+                break;
+            case 4:
+                value = to32Le(buffer, j);
+                break;
+            default:
+                break;
+        }
+        buf[i] = value;
+        out[i] = value;
+        j += (nChannel * bitDepth);
+    }
+    _fft(buf, out, n / (nChannel * bitDepth), 1);
+
+    return buf;
 }
 

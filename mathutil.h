@@ -2,9 +2,15 @@
 #define MATHUTIL_H
 
 #include <stdlib.h>
+#include <math.h>
+#include <complex.h>
+
+typedef double complex cplx;
 
 class MathUtil
 {
+private:
+    static void _fft(cplx buf[], cplx out[], int n, int step);
 
 public:
     MathUtil();
@@ -20,7 +26,7 @@ public:
     static int8_t  to8Le(const unsigned char *arr, int pos);
 
 
-
+    static cplx *fft(const unsigned char *buf, unsigned int n, int nChannel,  int bitDepth);
 
 
 };
