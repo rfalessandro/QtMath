@@ -27,7 +27,7 @@ DialogMakeGraph::~DialogMakeGraph()
 unsigned char  *DialogMakeGraph::getGraph()
 {
     int bitDepth = (ui->cbDepth->itemData(ui->cbDepth->currentIndex()).toInt());
-    int sampleRate = 44100;
+    int sampleRate = ui->txtSampleRate->text().toInt();
     int nChannel = 2;
     double w = ( 2 *  M_PI)/sampleRate;
     int frequency = ui->sbFreq->value();
@@ -90,7 +90,7 @@ int DialogMakeGraph::getNChannel()
 
 int DialogMakeGraph::getSampleRate()
 {
-    return 44100;
+    return ui->txtSampleRate->text().toInt();
 }
 
 int DialogMakeGraph::getFrequency()

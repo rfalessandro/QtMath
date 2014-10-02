@@ -27,6 +27,7 @@ public:
 
 
     static cplx *fft(const unsigned char *buf, unsigned int n, int nChannel,  int bitDepth);
+    static cplx *fft(cplx *buf, unsigned int n);
 
 
 };

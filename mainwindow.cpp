@@ -289,12 +289,21 @@ void MainWindow::updateSoundInfo()
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
     tela->repaint();
 
-    cplx *buf = MathUtil::fft(buffer, szBuffer, nChannel, bitDepth);
-    for (int i = 0; i < sampleRate; i++)
-            if (!cimag(buf[i]))
-                printf("%g ", creal(buf[i]));
-            else
-                printf("(%g, %g) ", creal(buf[i]), cimag(buf[i]));
+    //double  mindB = 10 * log10(0.000005);
+
+
+    cplx *buf = MathUtil::fft(buffer, sampleRate, nChannel, bitDepth);
+
+    //cplx buff[8] = {1, 1, 1, 1, 0, 0, 0, 0} ;
+    //cplx *buf = MathUtil::fft(buff, 8);
+
+
+    for (int i = 0; i < sampleRate/2; i++) {
+            double d1 = creal(buf[i])/sampleRate;
+            double d2 = cimag(buf[i])/sampleRate;
+            double d3 = (pow(d1,2) + pow(d2,2));
+            printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
+    }
 }
 
 
