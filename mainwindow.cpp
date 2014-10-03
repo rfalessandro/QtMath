@@ -34,6 +34,13 @@ MainWindow::MainWindow(QWidget *parent) :
     tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 70));
 
 
+    spectrumWidget = new SpectrumWidget;
+    ui->vlFrame->addWidget((QWidget *)spectrumWidget);
+
+    spectrumWidget->setBackgroundColor(QColor( 0x22,0x33,0x55, 0xFF));
+    spectrumWidget->setLineColor(QColor(0x44, 0x88, 0x33, 0xFF));
+    spectrumWidget->setGraphLineColor(QColor(0x44, 0x88, 0x33, 0xFF));
+    spectrumWidget->setGraphBackgroundColor(QColor(0x44, 0x88, 0x33, 0x88));
 
 
 
@@ -68,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
             index = i;
         }
         ui->cbDevice->addItem(aux.split(":").at(0), aux );
-
     }
 
     ui->cbDevice->setCurrentIndex(index);
@@ -141,6 +147,10 @@ void MainWindow::makeGraph()
 
 
     updateSoundInfo();
+
+
+
+
 }
 
 void MainWindow::playSound()
@@ -301,9 +311,11 @@ void MainWindow::updateSoundInfo()
     for (int i = 0; i < sampleRate/2; i++) {
             double d1 = creal(buf[i])/sampleRate;
             double d2 = cimag(buf[i])/sampleRate;
-            double d3 = (pow(d1,2) + pow(d2,2));
+            int d3 = round(sqrt(pow(d1,2) + pow(d2,2)));
+            spectrumWidget->pushPy(d3);
             printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
     }
+    spectrumWidget->repaint();
 }
 
 

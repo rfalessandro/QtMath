@@ -1,6 +1,7 @@
 #include "mathutil.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <soundutil.h>
 
 MathUtil::MathUtil()
 {
@@ -109,34 +110,20 @@ void MathUtil::_fft(cplx buf[], cplx out[], int n, int step)
     }
 }
 
+
+
+
 cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, int bitDepth) {
     cplx out[n];
     cplx *buf = (cplx *)calloc(sizeof(cplx), n);
     unsigned int i = 0,j = 0;
     for (i = 0; i < n; i++) {
-        int value = 0;
-        switch (bitDepth) {
-            case 1:
-                value = to8Le(buffer, j);
-                break;
-            case 2:
-                value = to16Le(buffer, j);
-                break;
-            case 3:
-                value = to24Le(buffer, j);
-                break;
-            case 4:
-                value = to32Le(buffer, j);
-                break;
-            default:
-                break;
-        }
+        int value = Soundutil::getIntValue(buffer, j, bitDepth);
         buf[i] = value;
         out[i] = value;
         j += (nChannel * bitDepth);
     }
     _fft(buf, out, n , 1);
-
     return buf;
 }
 

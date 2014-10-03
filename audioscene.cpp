@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <QtGui>
 #include <QGraphicsPolygonItem>
+#include <soundutil.h>
 
 AudioScene::AudioScene(QWidget *parent) :
     QGraphicsView(parent)
@@ -84,23 +85,7 @@ void AudioScene::createPoly()
     scene->clear();
     unsigned int i = 0,j = 0;
     for( i = 0; j < szBuffer ; i ++ ) {
-        int value = 0;
-        switch ( this->bitDepth) {
-            case 1:
-                value = MathUtil::to8Le(buffer, j);
-                break;
-            case 2:
-                value = MathUtil::to16Le(buffer, j);
-                break;
-            case 3:
-                value = MathUtil::to24Le(buffer, j);
-                break;
-            case 4:
-                value = MathUtil::to32Le(buffer, j);
-                break;
-            default:
-                break;
-        }
+        int value = Soundutil::getIntValue(buffer, j, bitDepth);
         graph->append(QPoint(i, - value));
         j += (this->nChannel * this->bitDepth);
     }

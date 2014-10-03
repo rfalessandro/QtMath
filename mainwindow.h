@@ -6,7 +6,7 @@
 #include <sound.h>
 #include <QThread>
 #include "rawinfodialog.h"
-
+#include "spectrumwidget.h"
 namespace Ui {
 class MainWindow;
 }
@@ -27,6 +27,7 @@ public:
 private:
     Ui::MainWindow *ui;
     AudioScene *tela;
+    SpectrumWidget *spectrumWidget;
     QThread *threadSound;
     Sound *sound;
     unsigned char *buffer;

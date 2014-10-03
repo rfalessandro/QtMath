@@ -14,6 +14,8 @@ DialogMakeGraph::DialogMakeGraph(QWidget *parent) :
     ui->cbDepth->addItem(" 24 Bits ", 3);
     ui->cbDepth->addItem(" 32 Bits ", 4);
     ui->cbDepth->setCurrentIndex(1);
+
+    ui->txtSampleRate->setValidator( new QIntValidator(0, 999999999, this) );
 }
 
 DialogMakeGraph::~DialogMakeGraph()
