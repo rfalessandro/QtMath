@@ -9,10 +9,15 @@ class GraphWidget : public QWidget
 protected:
     void updateGraph();
     void paintEvent(QPaintEvent *);
+    void mousePressEvent(QMouseEvent *evt);
+    void mouseMoveEvent(QMouseEvent *evt);
+    void wheelEvent(QWheelEvent *evt);
 
+    QPoint ptOld;
     QColor backgroundColor;
     QColor lineColor;
     QColor pointColor;
+    QColor fontColor;
     QColor graphBackgroundColor;
     QColor graphLineColor;
     int dy;
@@ -20,6 +25,11 @@ protected:
     double zoom;
 
     QList<int> *lsPy;
+
+    int xMax;
+    int yMax;
+    int deltaX;
+    int deltaY;
 
 public:
     explicit GraphWidget(QWidget *parent = 0);
@@ -36,11 +46,12 @@ public:
 
 
     double getZoom() const;
-
+    void clear();
     void pushPy(int py);
     void setLsPy(QList<int> *lsPy);
     void setBackgroundColor(const QColor &backgroundColor);
     void setLineColor(const QColor &lineColor);
+    void setFontColor(const QColor &fontColor);
     void setPointColor(const QColor &graphLineColor);
     void setGraphBackgroundColor(const QColor &graphBackgroundColor);
     void setGraphLineColor(const QColor &graphLineColor);

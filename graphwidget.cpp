@@ -1,5 +1,5 @@
 #include "graphwidget.h"
-
+#include <QMouseEvent>
 GraphWidget::GraphWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -10,11 +10,14 @@ GraphWidget::GraphWidget(QWidget *parent) :
     graphLineColor = QColor(0x44, 0x88, 0x33, 0xFF);
     graphBackgroundColor = QColor(0x44, 0x88, 0x33, 0x88);
     lineColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
+    fontColor = QColor(0xFF, 0xFF, 0xFF, 0xFF);
     dx = 0;
     dy = 0;
     zoom = 1;
 
     lsPy = NULL;
+
+
 
 }
 
@@ -106,6 +109,15 @@ void GraphWidget::setLineColor(const QColor &lineColor)
 }
 
 
+void GraphWidget::setFontColor(const QColor &fontColor)
+{
+    if(this->fontColor != fontColor) {
+        this->fontColor = fontColor;
+        updateGraph();
+    }
+}
+
+
 
 void GraphWidget::setGraphBackgroundColor(const QColor &graphBackgroundColor)
 {
@@ -149,14 +161,42 @@ QList<int> *GraphWidget::getLsPy() const{
     return this->lsPy;
 }
 
+void GraphWidget::mousePressEvent(QMouseEvent *evt)
+{
+    this->ptOld = evt->globalPos();
+}
 
+void GraphWidget::mouseMoveEvent(QMouseEvent *evt)
+{
+    const QPoint delta = evt->globalPos() - ptOld;
+    dx = std::max(0, dx - ( delta.x()) );
+    dy =  dy + ( delta.y()) ;
+    ptOld = evt->globalPos();
+    updateGraph();
+    emit valueChanged();
+}
+
+void GraphWidget::wheelEvent(QWheelEvent *evt)
+{
+    zoom = std::max(0.1, (zoom) + evt->delta()/120);
+    updateGraph();
+    emit valueChanged();
+}
 
 void GraphWidget::updateGraph()
 {
+    repaint();
 
 }
 
 void GraphWidget::paintEvent(QPaintEvent *)
 {
 
+}
+
+void GraphWidget::clear()
+{
+    if(this->lsPy != NULL) {
+        this->lsPy->clear();
+    }
 }

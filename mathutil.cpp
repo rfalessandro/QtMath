@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <soundutil.h>
-
+#include <string.h>
 MathUtil::MathUtil()
 {
 
@@ -114,8 +114,12 @@ void MathUtil::_fft(cplx buf[], cplx out[], int n, int step)
 
 
 cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, int bitDepth) {
-    cplx out[n];
-    cplx *buf = (cplx *)calloc(sizeof(cplx), n);
+    int n2 = pow(2, ceil(log2((double)n)) );
+    //int n2 = n;
+
+    cplx *out = (cplx *)calloc(sizeof(cplx), n2);
+    cplx *buf = (cplx *)calloc(sizeof(cplx), n2);
+
     unsigned int i = 0,j = 0;
     for (i = 0; i < n; i++) {
         int value = Soundutil::getIntValue(buffer, j, bitDepth);
@@ -123,18 +127,24 @@ cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, i
         out[i] = value;
         j += (nChannel * bitDepth);
     }
-    _fft(buf, out, n , 1);
+
+    _fft(buf, out, n2 , 1);
     return buf;
 }
 
 cplx *MathUtil::fft(cplx *buffer, unsigned int n) {
-    cplx out[n];
+
+    int n2 = pow(2, (int)( log2((double)n) + 0.5 ));
+    //int n2 = n;
+
+    cplx *out = (cplx *)calloc(sizeof(cplx), n2);
+
     unsigned int i = 0;
 
     for (i = 0; i < n; i++) {
         out[i] = buffer[i];
     }
-    _fft(buffer, out, n, 1);
+    _fft(buffer, out, n2, 1);
 
     return buffer;
 }

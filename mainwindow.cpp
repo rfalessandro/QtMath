@@ -36,11 +36,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     spectrumWidget = new SpectrumWidget;
     ui->vlFrame->addWidget((QWidget *)spectrumWidget);
-
-    spectrumWidget->setBackgroundColor(QColor( 0x22,0x33,0x55, 0xFF));
-    spectrumWidget->setLineColor(QColor(0x44, 0x88, 0x33, 0xFF));
-    spectrumWidget->setGraphLineColor(QColor(0x44, 0x88, 0x33, 0xFF));
-    spectrumWidget->setGraphBackgroundColor(QColor(0x44, 0x88, 0x33, 0x88));
+    spectrumWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
+    spectrumWidget->setLineColor(QColor(0xFF, 0x8A, 0x05, 0x88) );
+    spectrumWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
+    spectrumWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xEE));
+    spectrumWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x68));
 
 
 
@@ -307,7 +307,7 @@ void MainWindow::updateSoundInfo()
     //cplx buff[8] = {1, 1, 1, 1, 0, 0, 0, 0} ;
     //cplx *buf = MathUtil::fft(buff, 8);
 
-
+    spectrumWidget->clear();
     for (int i = 0; i < sampleRate/2; i++) {
             double d1 = creal(buf[i])/sampleRate;
             double d2 = cimag(buf[i])/sampleRate;
