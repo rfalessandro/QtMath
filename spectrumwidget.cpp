@@ -48,16 +48,19 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
         double c =  (double)height() / (double)max  ;
         int pos = 0;
         dx = std::min(dx, lsPy->length());
-
+        painter.setPen(this->graphBackgroundColor);
         for (int i = dx ; i < lsPy->length() && pos < width() ; i++) {
             if(i!= 0 && i%400 == 0) {
                 painter.setPen(QPen(fontColor,2));
                 painter.drawText(pos, 20,  QString::number(i) + "Hz");
-                painter.setPen(QPen(graphLineColor,1));
+                painter.setPen(this->graphBackgroundColor);
             }
-            max = lsPy->at(i) *c;
-            painter.setBrush(this->graphBackgroundColor);
-            painter.drawLine(QPoint(pos,middle), QPoint(pos, middle - max));
+            max = middle - lsPy->at(i) *c;
+            painter.setBrush(this->graphLineColor);
+            painter.drawEllipse(pos-1, max-1, 2, 2);
+
+
+            painter.drawLine(QPoint(pos,middle), QPoint(pos, max));
             pos++;
         }
     }

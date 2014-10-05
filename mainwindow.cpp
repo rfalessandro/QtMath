@@ -31,16 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));    
     //tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
     tela->setGraphLineColor(QColor(0x2D, 0x67, 0x69));
-    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 70));
+    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 0x10));
 
 
     spectrumWidget = new SpectrumWidget;
-    ui->vlFrame->addWidget((QWidget *)spectrumWidget);
+    ui->vlFrame2->addWidget((QWidget *)spectrumWidget);
     spectrumWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     spectrumWidget->setLineColor(QColor(0xFF, 0x8A, 0x05, 0x88) );
     spectrumWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
-    spectrumWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xEE));
-    spectrumWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x68));
+    spectrumWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xAE));
+    spectrumWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x65));
 
 
 
