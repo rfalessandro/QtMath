@@ -12,6 +12,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <complex.h>
+#include <soundutil.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -301,11 +302,11 @@ void MainWindow::updateSoundInfo()
 
     //double  mindB = 10 * log10(0.000005);
 
+    unsigned int aux = sampleRate;
+    cplx *buf = MathUtil::fft(Soundutil::toComplex(buffer, &aux, nChannel, bitDepth), sampleRate);
 
-    cplx *buf = MathUtil::fft(buffer, sampleRate, nChannel, bitDepth);
 
-
-    //MathUtil::ifft(buf,sampleRate, nChannel, bitDepth);
+//    MathUtil::ifft(buf, aux);
 
 
     spectrumWidget->clear();
@@ -315,7 +316,7 @@ void MainWindow::updateSoundInfo()
             double d2 = cimag(buf[i])/sampleRate;
             int d3 = round( sqrt(pow(d1,2) + pow(d2,2)) );
             spectrumWidget->pushPy(d3);
-//            printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
+            //printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
     }
     spectrumWidget->repaint();
 }

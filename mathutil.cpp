@@ -117,7 +117,6 @@ void MathUtil::_fft(cplx buf[], cplx out[], int n, int step)
 
 cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, int bitDepth) {
     int n2 = pow(2, ceil(log2((double)n)) );
-    //int n2 = n;
 
     cplx *out = (cplx *)calloc(sizeof(cplx), n2);
     cplx *buf = (cplx *)calloc(sizeof(cplx), n2);
@@ -131,23 +130,16 @@ cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, i
         j += (nChannel * bitDepth);
     }
 
-    _fft(buf, out, n2 , 1);
+     _fft(buf, out, n2 , 1);
     return buf;
 }
 
-cplx *MathUtil::fft(cplx *buffer, unsigned int n) {
-
-    int n2 = pow(2, (int)( log2((double)n) + 0.5 ));
-    //int n2 = n;
+cplx *MathUtil::fft(cplx *buffer, unsigned int n)
+{
+    int n2 = pow(2, ceil(log2((double)n)) );
 
     cplx *out = (cplx *)calloc(sizeof(cplx), n2);
-
-    unsigned int i = 0;
-
-//    for (i = 0; i < n; i++) {
-//        out[i] = buffer[i];
-//    }
-    memcpy(out, buffer, sizeof(cplx) * n2);
+    memcpy(out, buffer, sizeof(cplx) * n);
 
     _fft(buffer, out, n2, 1);
 
@@ -156,7 +148,9 @@ cplx *MathUtil::fft(cplx *buffer, unsigned int n) {
 
 
 void MathUtil::ifft(cplx *buf, unsigned int n) {
+
     cplx *out = (cplx *)calloc(sizeof(cplx), n);
+
     for(int i = 0 ;i < n; i++) {
         cplx aux = conj(buf[i]);
         buf[i] = aux;

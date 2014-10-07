@@ -31,19 +31,16 @@ int Soundutil::getIntValue(const unsigned char *buffer, int pos, int bitDepth)
 }
 
 
-cplx *Soundutil::toComplex(const unsigned char * buffer,unsigned int n, int nChannel, int bitDepth)
+cplx *Soundutil::toComplex(const unsigned char * buffer, unsigned int *n, int nChannel, int bitDepth)
 {
-    int n2 = pow(2, ceil(log2((double)n)) );
-    //int n2 = n;
+    int n2 = pow(2, ceil(log2((double)*n)) );
     cplx *out = (cplx *)calloc(sizeof(cplx), n2);
-
     unsigned int i = 0,j = 0;
-    for (i = 0; i < n; i++) {
-        int value = Soundutil::getIntValue(buffer, j, bitDepth);
-        out[i] = value;
+    for (i = 0; i < *n; i++) {
+        out[i] = getIntValue(buffer, j, bitDepth);
         j += (nChannel * bitDepth);
     }
-
+    *n = n2;
     return out;
 
 }
