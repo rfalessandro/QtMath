@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <soundutil.h>
 #include <string.h>
+#include <complex.h>
+
 MathUtil::MathUtil()
 {
 
@@ -123,6 +125,7 @@ cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, i
     unsigned int i = 0,j = 0;
     for (i = 0; i < n; i++) {
         int value = Soundutil::getIntValue(buffer, j, bitDepth);
+
         buf[i] = value;
         out[i] = value;
         j += (nChannel * bitDepth);
@@ -141,11 +144,30 @@ cplx *MathUtil::fft(cplx *buffer, unsigned int n) {
 
     unsigned int i = 0;
 
-    for (i = 0; i < n; i++) {
-        out[i] = buffer[i];
-    }
+//    for (i = 0; i < n; i++) {
+//        out[i] = buffer[i];
+//    }
+    memcpy(out, buffer, sizeof(cplx) * n2);
+
     _fft(buffer, out, n2, 1);
 
     return buffer;
 }
+
+
+void MathUtil::ifft(cplx *buf, unsigned int n) {
+    cplx *out = (cplx *)calloc(sizeof(cplx), n);
+    for(int i = 0 ;i < n; i++) {
+        cplx aux = conj(buf[i]);
+        buf[i] = aux;
+        out[i] = aux;
+    }
+
+    _fft(buf, out, n, 1);
+
+    for(int i = 0 ;i < n; i++) {
+        buf[i] = conj(buf[i])/n;
+    }
+}
+
 

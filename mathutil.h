@@ -30,6 +30,9 @@ public:
     static cplx *fft(cplx *buf, unsigned int n);
 
 
+    static void ifft(cplx *buf, unsigned int n);
+
+
 };
 
 #endif // MATHUTIL_H
