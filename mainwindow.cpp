@@ -297,27 +297,36 @@ void MainWindow::updateSoundInfo()
 
     changeDevice();
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
-    tela->repaint();
 
-    //double  mindB = 10 * log10(0.000005);
+
 
     unsigned int aux = sampleRate;
-    cplx *buf = MathUtil::fft(Soundutil::toComplex(buffer, &aux, nChannel, bitDepth), sampleRate);
+    cplx *buf = MathUtil::fft(Soundutil::toComplex(buffer, &aux, nChannel, bitDepth, 0), sampleRate);
 
 
-//    MathUtil::ifft(buf, aux);
+
+
+
 
 
     spectrumWidget->clear();
-
     for (int i = 0; i < sampleRate/2; i++) {
             double d1 = creal(buf[i])/sampleRate;
             double d2 = cimag(buf[i])/sampleRate;
             int d3 = round( sqrt(pow(d1,2) + pow(d2,2)) );
+
             spectrumWidget->pushPy(d3);
             //printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
     }
+
+    ;
+    MathUtil::ifft(buf, aux);
+
+    buffer = Soundutil::toBuffer( buf,  &aux,sampleRate, nChannel, bitDepth);
+
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+    tela->repaint();
+
     spectrumWidget->repaint();
 }
 

@@ -2,6 +2,7 @@
 #include "ui_dialogmakegraph.h"
 #include <math.h>
 #include "mathutil.h"
+#include "soundutil.h"
 DialogMakeGraph::DialogMakeGraph(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogMakeGraph)
@@ -48,27 +49,14 @@ unsigned char  *DialogMakeGraph::getGraph()
 
     for(int i=0; i < sampleRate; i++ ) {
         int y =  round(sin(  i * w   * frequency ) * (amplitude));
-        switch (bitDepth) {
-            case 1:
-                aux = MathUtil::to8Le(y);
-                break;
-            case 2:
-                aux = MathUtil::to16Le(y);
-                break;
-            case 3:
-                aux = MathUtil::to24Le(y);
-                break;
-            case 4:
-                aux = MathUtil::to32Le(y);
-                break;
-            default:
-                break;
-        }
+
+        aux = Soundutil::getCharValue(y, bitDepth);
 
         for(int w=0; w < nChannel ; w++) {
             memcpy(buffer+j, aux, bitDepth);
             j += bitDepth;
         }
+
         if(aux != NULL)  {
             free(aux);
         }
