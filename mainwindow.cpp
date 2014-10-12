@@ -321,12 +321,16 @@ void MainWindow::updateSoundInfo()
 
     }
 
-
-//    for (int i = 0;  i < newSz/2; i++) {
+//    double d = 200000;
+//    for (int i = 1;  i < newSz/2; i++) {
 //        int a = SoundUtil::frequencyToIndex(i, sampleRate, newSz);
-//        int d = 0;
-//        buf[a] = 0;
-//        buf[newSz - a] = 0;
+//        if(i % 1000 == 0) {
+//            d = 100000*i;
+//        }else {
+//            d = 0;
+//        }
+//        buf[a] = 0 + d*I;
+//        buf[newSz - a] = 0 + d*I;
 //    }
 
     spectrumWidget->setBinConst( (double)sampleRate / (double)newSz);

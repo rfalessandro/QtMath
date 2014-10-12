@@ -62,13 +62,13 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
                 painter.setPen(this->graphBackgroundColor);
             }
 
-            double y = middle - lsPy->at(i / binConst) * c;
+            double y = middle - 20.0 * log( (lsPy->at(i / binConst) +1) ) ;
 
             painter.setBrush(this->graphLineColor);
             painter.drawEllipse(pos-1, y-1, 2, 2);
 
 
-            painter.drawLine(QPoint(pos,middle), QPoint(pos, y));
+            painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
             pos+=1;
         }
     }
