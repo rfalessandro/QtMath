@@ -2,13 +2,13 @@
 #include "mathutil.h"
 #include <string.h>
 
-Soundutil::Soundutil()
+SoundUtil::SoundUtil()
 {
 }
 
 
 
-int Soundutil::getIntValue(const unsigned char *buffer, int pos, int bitDepth)
+int SoundUtil::getIntValue(const unsigned char *buffer, int pos, int bitDepth)
 {
     int value;
     switch (bitDepth) {
@@ -32,7 +32,7 @@ int Soundutil::getIntValue(const unsigned char *buffer, int pos, int bitDepth)
 
 
 
-unsigned char *Soundutil::getCharValue(int value, int  bitDepth)
+unsigned char *SoundUtil::getCharValue(int value, int  bitDepth)
 {
     switch (bitDepth) {
         case 1:
@@ -55,10 +55,10 @@ unsigned char *Soundutil::getCharValue(int value, int  bitDepth)
 
 
 
-cplx *Soundutil::toComplex(const unsigned char * buffer, unsigned int *n, int nChannel, int bitDepth, int channel)
+cplx *SoundUtil::toComplex(const unsigned char * buffer, unsigned int *n, int nChannel, int bitDepth, int channel)
 {    
     int n2 = pow(2, ceil(log2((double)*n)) );
-    cplx *out = (cplx *)calloc(sizeof(cplx), n2);    
+    cplx *out = (cplx *)calloc(sizeof(cplx), n2);
     unsigned int i = 0,j = channel * bitDepth;
     for (i = 0; i < *n; i++) {
         out[i] = getIntValue(buffer, j, bitDepth);
@@ -70,7 +70,7 @@ cplx *Soundutil::toComplex(const unsigned char * buffer, unsigned int *n, int nC
 }
 
 
-unsigned char *Soundutil::toBuffer(const cplx *buffer, unsigned int *n, int sampleRate, int nChannel, int bitDepth)
+unsigned char *SoundUtil::toBuffer(const cplx *buffer, unsigned int *n, int sampleRate, int nChannel, int bitDepth)
 {
     int szBuffer = (sampleRate * nChannel * bitDepth);
     unsigned char *out = (unsigned char *)calloc(sizeof(unsigned char), szBuffer);
@@ -104,4 +104,13 @@ unsigned char *Soundutil::toBuffer(const cplx *buffer, unsigned int *n, int samp
     *n = j;
     return out;
 
+}
+double SoundUtil::indexToFrequency(int i, int sampleRate, int szFFT)
+{
+    return ( (double)i * ( (double)sampleRate / (double)szFFT ) );
+}
+
+int SoundUtil::frequencyToIndex(double freq, int sampleRate, int szFFT)
+{
+    return (int) (( freq / ( (double)sampleRate / (double)szFFT ) ) );
 }

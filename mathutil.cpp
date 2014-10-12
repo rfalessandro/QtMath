@@ -123,7 +123,7 @@ cplx *MathUtil::fft(const unsigned char *buffer, unsigned int n, int nChannel, i
 
     unsigned int i = 0,j = 0;
     for (i = 0; i < n; i++) {
-        int value = Soundutil::getIntValue(buffer, j, bitDepth);
+        int value = SoundUtil::getIntValue(buffer, j, bitDepth);
 
         buf[i] = value;
         out[i] = value;

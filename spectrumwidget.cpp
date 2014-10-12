@@ -1,9 +1,12 @@
 #include "spectrumwidget.h"
 #include <QPainter>
+#include <math.h>
+#include <soundutil.h>
 
 SpectrumWidget::SpectrumWidget(QWidget *parent) :
     GraphWidget(parent)
 {
+    binConst = 44100.0/65536.0;
 }
 
 
@@ -38,31 +41,46 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
     painter.setPen(QPen(graphLineColor,1));
 
     if(lsPy != NULL) {
-        int max = 0;
+        int maxY = 0;
         for (int i = 0 ; i < lsPy->length() ; i++) {
             int y = lsPy->at(i);
-            if(y > max) {
-                max = y;
-                }
+            if(y > maxY) {
+                maxY = y;
             }
-        double c =  (double)height() / (double)max  ;
+        }
+        double c =  (double)height() / (double)maxY  ;
         int pos = 0;
         dx = std::min(dx, lsPy->length());
         painter.setPen(this->graphBackgroundColor);
         for (int i = dx ; i < lsPy->length() && pos < width() ; i++) {
             if(i!= 0 && i%400 == 0) {
                 painter.setPen(QPen(fontColor,2));
-                painter.drawText(pos, 20,  QString::number(i) + "Hz");
+                painter.drawText(pos - 20, 20,  QString::number(i) + "Hz");
+                painter.setPen(this->lineColor);
+                painter.drawLine(QPoint(pos, 0), QPoint(pos, height()));
+
                 painter.setPen(this->graphBackgroundColor);
             }
-            max = middle - lsPy->at(i) *c;
+
+            double y = middle - lsPy->at(i / binConst) * c;
+
             painter.setBrush(this->graphLineColor);
-            painter.drawEllipse(pos-1, max-1, 2, 2);
+            painter.drawEllipse(pos-1, y-1, 2, 2);
 
 
-            painter.drawLine(QPoint(pos,middle), QPoint(pos, max));
-            pos++;
+            painter.drawLine(QPoint(pos,middle), QPoint(pos, y));
+            pos+=1;
         }
     }
     painter.end();
+}
+
+
+void SpectrumWidget::setBinConst(double value)
+{
+    this->binConst = value;
+}
+double SpectrumWidget::getBinConst() const
+{
+    return this->binConst;
 }

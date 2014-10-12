@@ -50,7 +50,7 @@ unsigned char  *DialogMakeGraph::getGraph()
     for(int i=0; i < sampleRate; i++ ) {
         int y =  round(sin(  i * w   * frequency ) * (amplitude));
 
-        aux = Soundutil::getCharValue(y, bitDepth);
+        aux = SoundUtil::getCharValue(y, bitDepth);
 
         for(int w=0; w < nChannel ; w++) {
             memcpy(buffer+j, aux, bitDepth);

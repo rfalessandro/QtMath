@@ -85,7 +85,7 @@ void AudioScene::createPoly()
     scene->clear();
     unsigned int i = 0,j = 0;
     for( i = 0; j < szBuffer ; i ++ ) {
-        int value = Soundutil::getIntValue(buffer, j, bitDepth);
+        int value = SoundUtil::getIntValue(buffer, j, bitDepth);
         graph->append(QPoint(i, - value));
         j += (this->nChannel * this->bitDepth);
     }

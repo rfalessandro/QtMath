@@ -11,9 +11,11 @@ class SpectrumWidget : public GraphWidget
 protected:
     void updateGraph();
     void paintEvent(QPaintEvent *);
-
+    double binConst;
 public:
     explicit SpectrumWidget(QWidget *parent = 0);
+    void setBinConst(double value);
+    double getBinConst() const;
 signals:
 
 public slots:

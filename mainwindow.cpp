@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     spectrumWidget = new SpectrumWidget;
     ui->vlFrame2->addWidget((QWidget *)spectrumWidget);
     spectrumWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
-    spectrumWidget->setLineColor(QColor(0xFF, 0x8A, 0x05, 0x88) );
+    spectrumWidget->setLineColor(QColor(0xDE, 0xDE, 0xDE, 0xFF) );
     spectrumWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
     spectrumWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xAE));
     spectrumWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x65));
@@ -300,8 +300,8 @@ void MainWindow::updateSoundInfo()
 
 
 
-    unsigned int aux = sampleRate;
-    cplx *buf = MathUtil::fft(Soundutil::toComplex(buffer, &aux, nChannel, bitDepth, 0), sampleRate);
+    unsigned int newSz = sampleRate;
+    cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
 
 
 
@@ -310,19 +310,46 @@ void MainWindow::updateSoundInfo()
 
 
     spectrumWidget->clear();
-    for (int i = 0; i < sampleRate/2; i++) {
-            double d1 = creal(buf[i])/sampleRate;
-            double d2 = cimag(buf[i])/sampleRate;
+
+    double maxY = 0;
+
+    for (int i = 0; i < newSz/2; i++) {
+        double y = creal(buf[i]);
+        if(y > maxY) {
+            maxY = y;
+        }
+
+    }
+
+
+//    for (int i = 0;  i < newSz/2; i++) {
+//        int a = SoundUtil::frequencyToIndex(i, sampleRate, newSz);
+//        int d = 0;
+//        buf[a] = 0;
+//        buf[newSz - a] = 0;
+//    }
+
+    spectrumWidget->setBinConst( (double)sampleRate / (double)newSz);
+
+    for (int i = 0; i < sampleRate/2 && i < newSz; i++) {
+            double d1 = creal(buf[i])/newSz;
+
+            double d2 = cimag(buf[i])/newSz;
             int d3 = round( sqrt(pow(d1,2) + pow(d2,2)) );
+
 
             spectrumWidget->pushPy(d3);
             //printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
     }
 
-    ;
-    MathUtil::ifft(buf, aux);
 
-    buffer = Soundutil::toBuffer( buf,  &aux,sampleRate, nChannel, bitDepth);
+
+
+    MathUtil::ifft(buf, newSz);
+
+
+    buffer = SoundUtil::toBuffer( buf,  &newSz,sampleRate, nChannel, bitDepth);
+    szBuffer = newSz;
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
     tela->repaint();
