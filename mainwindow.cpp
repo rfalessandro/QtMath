@@ -313,10 +313,12 @@ void MainWindow::updateSoundInfo()
 
     double maxY = 0;
 
-    for (int i = 0; i < newSz/2; i++) {
-        double y = creal(buf[i]);
-        if(y > maxY) {
-            maxY = y;
+    for (int i = 0; i < (int)newSz/2; i++) {
+        double d1 = creal(buf[i])/newSz;
+        double d2 = cimag(buf[i])/newSz;
+        double d3 = ( sqrt(pow(d1,2) + pow(d2,2)) );
+        if(d3 > maxY) {
+            maxY =  d3;
         }
 
     }
@@ -334,15 +336,25 @@ void MainWindow::updateSoundInfo()
 //    }
 
     spectrumWidget->setBinConst( (double)sampleRate / (double)newSz);
+    int nyquist = sampleRate/2;
+    //int d= (int)(60.0 / ((double)sampleRate / (double)newSz));
+    //buf[d] = 0 + 0*I;
+    //buf[newSz - d ] = 0 + 0*I;
 
-    for (int i = 0; i < sampleRate/2 && i < newSz; i++) {
-            double d1 = creal(buf[i])/newSz;
+    for (int i = 0; i < nyquist + 1  && i < (int)newSz; i++) {
+            cplx complexAux = (buf[i] / newSz);
 
-            double d2 = cimag(buf[i])/newSz;
-            int d3 = round( sqrt(pow(d1,2) + pow(d2,2)) );
+            if(i != 0 && i != nyquist) {
+               complexAux  = (complexAux * 2);
+            }
+
+            double d1 = creal(complexAux) ;
+            double d2 = cimag(complexAux) ;
 
 
+            int d3 = (int)( sqrt(pow(d1,2) + pow(d2,2)) );
             spectrumWidget->pushPy(d3);
+
             //printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
     }
 
@@ -352,7 +364,7 @@ void MainWindow::updateSoundInfo()
     MathUtil::ifft(buf, newSz);
 
 
-    buffer = SoundUtil::toBuffer( buf,  &newSz,sampleRate, nChannel, bitDepth);
+    buffer = SoundUtil::toBuffer( buf,   &newSz,sampleRate, nChannel, bitDepth);
     szBuffer = newSz;
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
