@@ -4,7 +4,8 @@
 #include <soundutil.h>
 #include <string.h>
 #include <complex.h>
-
+#include <math.h>
+#include <algorithm>
 MathUtil::MathUtil()
 {
 
@@ -151,7 +152,7 @@ void MathUtil::ifft(cplx *buf, unsigned int n) {
 
     cplx *out = (cplx *)calloc(sizeof(cplx), n);
 
-    for(int i = 0 ;i < n; i++) {
+    for(unsigned int i = 0 ;i < n; i++) {
         cplx aux = conj(buf[i]);
         buf[i] = aux;
         out[i] = aux;
@@ -159,9 +160,152 @@ void MathUtil::ifft(cplx *buf, unsigned int n) {
 
     _fft(buf, out, n, 1);
 
-    for(int i = 0 ;i < n; i++) {
+    for(unsigned int i = 0 ;i < n; i++) {
         buf[i] = conj(buf[i])/n;
     }
 }
 
+void MathUtil::addArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2)
+{
+    unsigned int szMin = std::min(n,n2);
+    for(unsigned int i = 0 ;i < szMin; i++) {
+        buf[i] += buf2[i];
+    }
+}
 
+void MathUtil::subArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2)
+{
+    unsigned int szMin = std::min(n,n2);
+    for(unsigned int i = 0 ;i < szMin; i++) {
+        buf[i] -= buf2[i];
+    }
+}
+
+void MathUtil::divArray(cplx *buf, unsigned int n,const cplx *buf2, unsigned int n2)
+{
+    unsigned int szMin = std::min(n,n2);
+    for(unsigned int i = 0 ;i < szMin; i++) {
+        buf[i] /= buf2[i];
+    }
+}
+
+void MathUtil::multiArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2)
+{
+    unsigned int szMin = std::min(n,n2);
+    for(unsigned int i = 0 ;i < szMin; i++) {
+        buf[i] *= buf2[i];
+    }
+}
+
+void MathUtil::addArray(cplx *buf, unsigned int n, const cplx value)
+{
+    for(unsigned int i = 0 ;i < n; i++) {
+        buf[i] += value;
+    }
+}
+
+void MathUtil::subArray(cplx *buf, unsigned int n, const cplx value)
+{
+    for(unsigned int i = 0 ;i < n; i++) {
+        buf[i] -= value;
+    }
+}
+
+void MathUtil::divArray(cplx *buf, unsigned int n, const cplx value)
+{
+    for(unsigned int i = 0 ;i < n; i++) {
+        buf[i] /= value;
+    }
+}
+
+void MathUtil::multiArray(cplx *buf, unsigned int n, const cplx value)
+{
+    for(unsigned int i = 0 ; i < n; i++) {
+        buf[i] *= value;
+    }
+}
+
+
+
+cplx getMaxMaginitude(const cplx *buf, unsigned int n)
+{
+
+    double maxY = 0;
+    unsigned int pos = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = creal(buf[i]);
+        double d2 = cimag(buf[i]);
+        double d3 = ( sqrt(pow(d1,2) + pow(d2,2)) );
+        if(d3 > maxY) {
+            maxY =  d3;
+            pos = i;
+        }
+    }
+    return buf[pos];
+}
+
+cplx getMinMaginitude(const cplx *buf, unsigned int n)
+{
+    double minY = 0;
+    unsigned int pos = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = creal(buf[i]);
+        double d2 = cimag(buf[i]);
+        double d3 = ( sqrt(pow(d1,2) + pow(d2,2)) );
+        if(d3 < minY) {
+            minY =  d3;
+            pos = i;
+        }
+    }
+    return buf[pos];
+
+}
+
+double getMaxReal(const cplx *buf, unsigned int n)
+{
+    double maxY = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = creal(buf[i]);
+        if(d1 > maxY) {
+            maxY =  d1;
+        }
+    }
+    return maxY;
+}
+
+double getMinReal(const cplx *buf, unsigned int n)
+{
+    double minY = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = creal(buf[i]);
+        if(d1 < minY) {
+            minY =  d1;
+        }
+    }
+    return minY;
+}
+
+double getMaxImaginary(const cplx *buf, unsigned int n)
+{
+    double maxY = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = cimag(buf[i]);
+        if(d1 > maxY) {
+            maxY =  d1;
+        }
+    }
+    return maxY;
+}
+
+double getMinImaginary(const cplx *buf, unsigned int n)
+{
+    double minY = 0;
+    for(unsigned int i = 0 ;i < n; i++) {
+        double d1 = cimag(buf[i]);
+        if(d1 < minY) {
+            minY =  d1;
+        }
+    }
+    return minY;
+
+}

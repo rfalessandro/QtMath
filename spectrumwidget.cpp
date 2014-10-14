@@ -10,11 +10,34 @@ SpectrumWidget::SpectrumWidget(QWidget *parent) :
 }
 
 
+void SpectrumWidget::setBuffer(const cplx *buffer, unsigned int szBuffer, unsigned int sampleRate)
+{
+    clear();
+    this->binConst =     (double)sampleRate / (double)szBuffer;
 
+    unsigned int nyquist = szBuffer/2;
+    for (unsigned int i = 0; i < nyquist + 1  && i < szBuffer; i++) {
+            cplx complexAux = (buffer[i] / szBuffer);
+
+            if(i != 0 && i != nyquist) {
+               complexAux  = (complexAux * 2);
+            }
+
+            double d1 = creal(complexAux) ;
+            double d2 = cimag(complexAux) ;
+
+            int d3 = (int)( sqrt(pow(d1,2) + pow(d2,2)) );
+            this->pushPy(d3);
+
+            //printf("%d hz: [%g  ; %g] = %g\n ", i, d1, d2, d3);
+    }
+
+    updateGraph();
+}
 
 void SpectrumWidget::updateGraph()
 {
-
+    this->repaint();
 }
 
 void SpectrumWidget::paintEvent(QPaintEvent *)

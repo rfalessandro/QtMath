@@ -33,6 +33,23 @@ public:
     static void ifft(cplx *buf, unsigned int n);
 
 
+    static void addArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2);
+    static void subArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2);
+    static void divArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2);
+    static void multiArray(cplx *buf, unsigned int n, const cplx *buf2, unsigned int n2);
+
+    static void addArray(cplx *buf, unsigned int n, const cplx value);
+    static void subArray(cplx *buf, unsigned int n, const cplx value);
+    static void divArray(cplx *buf, unsigned int n, const cplx value);
+    static void multiArray(cplx *buf, unsigned int n, const cplx value);
+
+    static cplx getMaxMaginitude(const cplx *buff, unsigned int n);
+    static cplx getMinMaginitude(const cplx *buff, unsigned int n);
+    static double getMaxReal(const cplx *buff, unsigned int n);
+    static double getMinReal(const cplx *buff, unsigned int n);
+    static double getMaxImaginary(const cplx *buff, unsigned int n);
+    static double getMinImaginary(const cplx *buff, unsigned int n);
+
 };
 
 #endif // MATHUTIL_H

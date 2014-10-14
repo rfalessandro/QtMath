@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include "graphwidget.h"
+#include <complex.h>
+
+typedef double complex cplx;
 
 class SpectrumWidget : public GraphWidget
 {
@@ -16,6 +19,7 @@ public:
     explicit SpectrumWidget(QWidget *parent = 0);
     void setBinConst(double value);
     double getBinConst() const;
+    void setBuffer(const cplx *buffer, unsigned int szBuffer, unsigned int sampleRate);
 signals:
 
 public slots:
