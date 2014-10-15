@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     dialogmakegraph.cpp \
     soundutil.cpp \
     graphwidget.cpp \
-    spectrumwidget.cpp
+    spectrumwidget.cpp \
+    soundspleet.cpp
 
 HEADERS  += mainwindow.h \
     sound.h \
@@ -34,7 +35,8 @@ HEADERS  += mainwindow.h \
     dialogmakegraph.h \
     soundutil.h \
     graphwidget.h \
-    spectrumwidget.h
+    spectrumwidget.h \
+    soundspleet.h
 
 FORMS    += mainwindow.ui \
     rawinfodialog.ui \

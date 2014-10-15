@@ -13,7 +13,7 @@
 #include <QFileDialog>
 #include <complex.h>
 #include <soundutil.h>
-
+#include <soundspleet.h>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -297,15 +297,13 @@ void MainWindow::updateSoundInfo()
 
     changeDevice();
 
-
+    SoundSpleet spleet;
+    spleet.split(buffer, szBuffer, nChannel, bitDepth);
+    printf("%d", spleet.getCount());
 
 
     unsigned int newSz = sampleRate;
     cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
-
-    //    int d= SoundUtil::frequencyToIndex(60, sampleRate, newSz);
-//    buf[d] = 0;
-//    buf[newSz - d ] = 0;
 
     spectrumWidget->setBuffer(buf, newSz, sampleRate);
 
