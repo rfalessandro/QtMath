@@ -130,7 +130,7 @@ void Sound::run() {
     int dir;
     char *bufferToPlay;
     QString str = "";
-    int desloc = 0;
+    unsigned int desloc = 0;
 
 
     /* Open PCM device for playback. */

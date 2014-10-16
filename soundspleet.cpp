@@ -39,7 +39,7 @@ void SoundSpleet::split(unsigned char *buffer, unsigned int n, int nChannel, int
     unsigned int *arrSplitPos = (unsigned int *)calloc(sizeof(unsigned int), sz);
     unsigned int itSpliPos = 0;
     arrSplitPos[itSpliPos++] = 0;
-    for (i = 0; i < sz; i++) {
+    for (i = 0; i < sz ; i++) {
         int value = SoundUtil::getIntValue(buffer, j, bitDepth);
         if(i == sz/2) {
             arrSplitPos[itSpliPos++] = i;
@@ -49,7 +49,7 @@ void SoundSpleet::split(unsigned char *buffer, unsigned int n, int nChannel, int
 
     if(itSpliPos > 0) {
         if(arrSplitPos[itSpliPos] < n)  {
-            arrSplitPos[itSpliPos++] = n;
+            arrSplitPos[itSpliPos++] = n - 1;
         }
         buf = (unsigned char **)calloc(sizeof(unsigned char *), itSpliPos-1);
         szBuff = (unsigned int *)calloc(sizeof(unsigned int), itSpliPos-1);
@@ -60,7 +60,7 @@ void SoundSpleet::split(unsigned char *buffer, unsigned int n, int nChannel, int
             unsigned int pos = arrSplitPos[i+1];
             unsigned int szPos = szFrame * ( pos - lastPos);
             buf[i] = (unsigned char *)calloc(sizeof(unsigned char), szPos);
-            memcpy((void *)buf[i], buffer + lastPos, szPos );
+            memcpy(buf[i], buffer + lastPos, szPos );
             lastPos = pos;
             szBuff[i] = szPos;
         }
