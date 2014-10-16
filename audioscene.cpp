@@ -84,16 +84,33 @@ void AudioScene::createPoly()
     }
     scene->clear();
     unsigned int i = 0,j = 0;
+
+    double d =  height() / 30;
+    double ref =  0.001;// pow(20, -12);
+    double zeroLine = 20 * log10(pow(2,bitDepth));
+    double acc = 0;
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = SoundUtil::getIntValue(buffer, j, bitDepth);
-        graph->append(QPoint(i, - value));
+        acc += value * value;
+        j += (this->nChannel * this->bitDepth);
+    }
+    acc /= sampleRate;
+    acc *= 2;
+
+    double MAX_VALUE = (1 << (bitDepth*8)) ;
+    double y = (-20 * log10( MAX_VALUE - sqrt( acc ) ));
+    j=0;
+    for( i = 0; j < szBuffer ; i ++ ) {
+        int value = SoundUtil::getIntValue(buffer, j, bitDepth);
+
+        graph->append(QPoint(i, - y*value));
         j += (this->nChannel * this->bitDepth);
     }
    QPainterPath path;
    path.addPolygon(*graph);
    graphPoly = new QGraphicsPathItem(path);
 //   graphPoly->setBrush(graphBackgroundColor);
-   graphPoly->setPen(QPen(graphLineColor, 3));
+   graphPoly->setPen(QPen(graphLineColor, 2));
    scene->addItem(graphPoly);
 
 
