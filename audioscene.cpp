@@ -32,7 +32,7 @@ AudioScene::AudioScene(QWidget *parent) :
 
     dx = 0;
     dy = 0;
-    zoom = 0.05;
+    zoom = 1;
     pointDx = 0;
     szBuffer = 0;
 
@@ -77,41 +77,46 @@ void AudioScene::createPoly()
     if(graph == NULL) {
         graph = new QPolygon;
     }else {
+        //scene->removeItem(graphPolyPath);
         scene->removeItem(graphPoly);
-        delete graphPoly;
+        //delete graphPoly;
+        //delete graphPolyPath;
         graph->clear();
         scene->removeItem(ball);
     }
     scene->clear();
     unsigned int i = 0,j = 0;
-
-    double d =  height() / 30;
-    double ref =  0.001;// pow(20, -12);
-    double zeroLine = 20 * log10(pow(2,bitDepth));
-    double acc = 0;
-    for( i = 0; j < szBuffer ; i ++ ) {
-        int value = SoundUtil::getIntValue(buffer, j, bitDepth);
-        acc += value * value;
-        j += (this->nChannel * this->bitDepth);
-    }
-    acc /= sampleRate;
-    acc *= 2;
-
     double MAX_VALUE = (1 << (bitDepth*8)) ;
-    double y = (-20 * log10( MAX_VALUE - sqrt( acc ) ));
-    j=0;
+    double cs = (double)height()/(double)MAX_VALUE;
+
+
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = SoundUtil::getIntValue(buffer, j, bitDepth);
 
-        graph->append(QPoint(i, - y*value));
+
+        graph->append(QPoint(i, value*cs));
+
+        //scene->addLine(i, 0, i, -value*cs , QPen(graphLineColor, 1));
+
         j += (this->nChannel * this->bitDepth);
     }
-   QPainterPath path;
-   path.addPolygon(*graph);
-   graphPoly = new QGraphicsPathItem(path);
-//   graphPoly->setBrush(graphBackgroundColor);
-   graphPoly->setPen(QPen(graphLineColor, 2));
+
+
+   graphPoly = new QGraphicsPolygonItem(*graph);
+   graphPoly->setFillRule(Qt::WindingFill);
+   graphPoly->setOpacity(0.5);
+   graphPoly->setBrush(QColor(0xFF,0,0,0.5));
+   graphPoly->setPen(QPen(graphLineColor));
    scene->addItem(graphPoly);
+
+   //scene->addPolygon(*graph);
+
+//   QPainterPath path;
+//   path.addPolygon(*graph);
+//   path.setFillRule(Qt::WindingFill);
+   //graphPolyPath = new QGraphicsPathItem(path);
+   //graphPolyPath->setPen(QPen(graphLineColor, 2));
+   //scene->addItem(graphPolyPath);
 
 
 

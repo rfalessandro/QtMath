@@ -21,7 +21,8 @@ private:
     Ball *ball;
     unsigned const char *buffer;
     QPolygon *graph;
-    QGraphicsPathItem *graphPoly;
+    QGraphicsPathItem *graphPolyPath;
+    QGraphicsPolygonItem *graphPoly;
     QColor backgroundColor;
     QColor lineColor;
     QColor pointColor;
@@ -43,7 +44,7 @@ public:
     explicit AudioScene(QWidget *parent = 0);
     ~AudioScene();
 
-    static const int TIMEROUT = 20;
+    static const int TIMEROUT = 50;
     static const int SZ_PIXMAP = 4096;
     int getDy() const;
     int getDx() const;
