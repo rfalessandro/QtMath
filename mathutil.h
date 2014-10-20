@@ -50,6 +50,9 @@ public:
     static double getMaxImaginary(const cplx *buff, unsigned int n);
     static double getMinImaginary(const cplx *buff, unsigned int n);
 
+
+    static unsigned char *splitBuffer(unsigned const char *buffer, unsigned int posInit, unsigned int posEnd);
+
 };
 
 #endif // MATHUTIL_H

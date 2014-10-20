@@ -19,9 +19,7 @@ private:
     QGraphicsScene *scene;
     QTimer *timer;
     Ball *ball;
-    unsigned const char *buffer;
     QPolygon *graph;
-    QGraphicsPathItem *graphPolyPath;
     QGraphicsPolygonItem *graphPoly;
     QColor backgroundColor;
     QColor lineColor;
@@ -34,11 +32,7 @@ private:
     int pointDx;
     double zoom;
     int szSample;
-    int sampleRate;
-    int bitDepth;
-    int nChannel;
-    unsigned int szBuffer;
-    void createPoly();
+    void createPoly(unsigned const char *buffer, unsigned int szBuffer,  int bitDepth, int nChannel, bool reset);
 
 public:
     explicit AudioScene(QWidget *parent = 0);
@@ -55,7 +49,8 @@ public:
     QColor getGraphBackgroundColor();
     QColor getGraphLineColor();
 
-    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate);
+    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel);
+    void pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel);
     void setPointPos(int x, int y);
     void setDy(int dy);
     void setDx(int dx);    

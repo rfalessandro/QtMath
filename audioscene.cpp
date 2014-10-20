@@ -34,14 +34,11 @@ AudioScene::AudioScene(QWidget *parent) :
     dy = 0;
     zoom = 1;
     pointDx = 0;
-    szBuffer = 0;
+
 
 
 
     setScene(scene);
-
-    //setSceneRect(QRect(0,0,this->width()-10,this->height()-10));
-    //scene->setSceneRect(dx, dy, this->width()-10, this->height()-10);
 
     setRenderHint(QPainter::Antialiasing);
 
@@ -59,67 +56,52 @@ AudioScene::AudioScene(QWidget *parent) :
 }
 
 
-
-
-
-void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate)
+void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel)
 {
-    this->nChannel = nChannel;
-    this->bitDepth = bitDepth;
-    this->szBuffer = szBuffer;
-    this->buffer = buffer;
-    this->sampleRate = sampleRate;
-    this->szSample = (int)(0.5 + (this->szBuffer / (this->nChannel * this->bitDepth)));
-    createPoly();
+    this->szSample = (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
+    createPoly(buffer, szBuffer, bitDepth, nChannel, true);
 }
-void AudioScene::createPoly()
+
+
+void AudioScene::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel)
+{
+    this->szSample += (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
+    createPoly(buffer, szBuffer, bitDepth, nChannel, false);
+}
+
+
+void AudioScene::createPoly(unsigned const char *buffer, unsigned int szBuffer,  int bitDepth, int nChannel, bool reset)
 {
     if(graph == NULL) {
         graph = new QPolygon;
     }else {
-        //scene->removeItem(graphPolyPath);
+
         scene->removeItem(graphPoly);
-        //delete graphPoly;
-        //delete graphPolyPath;
-        graph->clear();
+        delete graphPoly;
+
+        if(reset) {
+            graph->clear();
+        }
         scene->removeItem(ball);
     }
     scene->clear();
     unsigned int i = 0,j = 0;
     unsigned int MAX_VALUE = (1 << (bitDepth*8 )) ;
     double cs = (double)height()/MAX_VALUE;
+    int desloc = graph->size();
 
     graph->append(QPoint(0, 0));
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = -SoundUtil::getIntValue(buffer, j, bitDepth);
-
-
-        graph->append(QPoint(i, value*cs));
-
-        //scene->addLine(i, 0, i, -value*cs , QPen(graphLineColor, 1));
-
-        j += (this->nChannel * this->bitDepth);
+        graph->append(QPoint(desloc, value*cs));
+        j += (nChannel * bitDepth);
+        desloc++;
     }
-
-   graph->append(QPoint(i, 0));
-
-   graphPoly = new QGraphicsPolygonItem(*graph);
-   graphPoly->setBrush(QBrush(graphBackgroundColor, Qt::SolidPattern));
-   graphPoly->setPen(QPen(graphLineColor));
-   scene->addItem(graphPoly);
-
-   //scene->addPolygon(*graph);
-
-//   QPainterPath path;
-//   path.addPolygon(*graph);
-//   path.setFillRule(Qt::WindingFill);
-   //graphPolyPath = new QGraphicsPathItem(path);
-   //graphPolyPath->setPen(QPen(graphLineColor, 2));
-   //scene->addItem(graphPolyPath);
-
-
-
-
+    graph->append(QPoint(desloc, 0));
+    graphPoly = new QGraphicsPolygonItem(*graph);
+    graphPoly->setBrush(QBrush(graphBackgroundColor, Qt::SolidPattern));
+    graphPoly->setPen(QPen(graphLineColor));
+    scene->addItem(graphPoly);
     ball->setMovement(0, 0 );
     ball->setBackgroundColor(pointColor);
     ball->setLineColor(graphLineColor);

@@ -312,7 +312,8 @@ void MainWindow::updateSoundInfo()
     buffer = SoundUtil::toBuffer( buf,   &newSz,sampleRate, nChannel, bitDepth);
     szBuffer = newSz;
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
+
     tela->repaint();
 
 

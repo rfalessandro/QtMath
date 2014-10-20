@@ -2,7 +2,7 @@
 #include "stdlib.h"
 #include "soundutil.h"
 #include <string.h>
-
+#include "mathutil.h"
 SoundSpleet::~SoundSpleet()
 {
     clear();
@@ -41,7 +41,7 @@ void SoundSpleet::split(unsigned char *buffer, unsigned int n, int nChannel, int
     arrSplitPos[itSpliPos++] = 0;
     for (i = 0; i < sz ; i++) {
         int value = SoundUtil::getIntValue(buffer, j, bitDepth);
-        if(i == sz/2) {
+        if(i ==  sz/2) {
             arrSplitPos[itSpliPos++] = j;
         }
         j += (nChannel * bitDepth);
@@ -53,18 +53,12 @@ void SoundSpleet::split(unsigned char *buffer, unsigned int n, int nChannel, int
         }
         buf = (unsigned char **)calloc(sizeof(unsigned char *), itSpliPos-1);
         szBuff = (unsigned int *)calloc(sizeof(unsigned int), itSpliPos-1);
-
-
         for(i =0; i< itSpliPos - 1; i++) {
-            unsigned int lastPos = arrSplitPos[i];
-            unsigned int pos = arrSplitPos[i+1];
-            unsigned int szPos =  ( pos - lastPos);
-            buf[i] = (unsigned char *)calloc(sizeof(unsigned char), szPos);
-            memcpy(buf[i], buffer + lastPos, szPos );
-            lastPos = pos;
-            szBuff[i] = szPos;
+            unsigned int posInit = arrSplitPos[i];
+            unsigned int posEnd = arrSplitPos[i+1];
+            buf[i] = MathUtil::splitBuffer(buffer, posInit, posEnd);
+            szBuff[i] = ( posEnd - posInit);
         }
-
     }
     count = itSpliPos - 1;
     free(arrSplitPos);

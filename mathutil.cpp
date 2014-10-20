@@ -227,7 +227,7 @@ void MathUtil::multiArray(cplx *buf, unsigned int n, const cplx value)
 
 
 
-cplx getMaxMaginitude(const cplx *buf, unsigned int n)
+cplx MathUtil::getMaxMaginitude(const cplx *buf, unsigned int n)
 {
 
     double maxY = 0;
@@ -244,7 +244,7 @@ cplx getMaxMaginitude(const cplx *buf, unsigned int n)
     return buf[pos];
 }
 
-cplx getMinMaginitude(const cplx *buf, unsigned int n)
+cplx MathUtil::getMinMaginitude(const cplx *buf, unsigned int n)
 {
     double minY = 0;
     unsigned int pos = 0;
@@ -261,7 +261,7 @@ cplx getMinMaginitude(const cplx *buf, unsigned int n)
 
 }
 
-double getMaxReal(const cplx *buf, unsigned int n)
+double MathUtil::getMaxReal(const cplx *buf, unsigned int n)
 {
     double maxY = 0;
     for(unsigned int i = 0 ;i < n; i++) {
@@ -273,7 +273,7 @@ double getMaxReal(const cplx *buf, unsigned int n)
     return maxY;
 }
 
-double getMinReal(const cplx *buf, unsigned int n)
+double MathUtil::getMinReal(const cplx *buf, unsigned int n)
 {
     double minY = 0;
     for(unsigned int i = 0 ;i < n; i++) {
@@ -285,7 +285,7 @@ double getMinReal(const cplx *buf, unsigned int n)
     return minY;
 }
 
-double getMaxImaginary(const cplx *buf, unsigned int n)
+double MathUtil::getMaxImaginary(const cplx *buf, unsigned int n)
 {
     double maxY = 0;
     for(unsigned int i = 0 ;i < n; i++) {
@@ -297,7 +297,7 @@ double getMaxImaginary(const cplx *buf, unsigned int n)
     return maxY;
 }
 
-double getMinImaginary(const cplx *buf, unsigned int n)
+double MathUtil::getMinImaginary(const cplx *buf, unsigned int n)
 {
     double minY = 0;
     for(unsigned int i = 0 ;i < n; i++) {
@@ -307,5 +307,13 @@ double getMinImaginary(const cplx *buf, unsigned int n)
         }
     }
     return minY;
+}
 
+
+unsigned char *MathUtil::splitBuffer(const unsigned char *buffer, unsigned int posInit, unsigned int posEnd)
+{
+    unsigned int szPos =  ( posEnd - posInit);
+    unsigned char *buf = (unsigned char *)calloc(sizeof(unsigned char), szPos);
+    memcpy(buf, buffer + posInit, szPos );
+    return buf;
 }
