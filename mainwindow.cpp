@@ -299,7 +299,7 @@ void MainWindow::updateSoundInfo()
 
     SoundSpleet spleet;
     spleet.split(buffer, szBuffer, nChannel, bitDepth);
-    printf("%d", spleet.getCount());
+
 
 
     unsigned int newSz = sampleRate;

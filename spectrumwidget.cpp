@@ -63,6 +63,8 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
 
     painter.setPen(QPen(graphLineColor,1));
 
+
+
     if(lsPy != NULL) {
         int maxY = 0;
         for (int i = 0 ; i < lsPy->length() ; i++) {
@@ -72,32 +74,37 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
             }
         }
         double c =  (double)height() / (double)maxY  ;
-        int pos = 0;
+        double pos = 0;
         dx = std::min(dx, lsPy->length());
+
         painter.setPen(this->graphBackgroundColor);
-        for (int i = dx ; i < lsPy->length() && pos < width() ; i++) {
-            int binPos =  i / binConst;
-            if(binPos >= lsPy->length()) {
-                break;
+
+        if(lsPy->length() > 0) {
+            zoom  =   ((double)width()/((double)lsPy->length() )) /  binConst  ;;
+            for (int i = dx ; i < lsPy->length() && pos < width() ; i++) {
+                int binPos =  i / binConst;
+                if(binPos >= lsPy->length()) {
+                    break;
+                }
+                if( i == 1000 || i == 4000 || i == 9000 || i == 14000 || i == 18000 || i == 22000    ) {
+                    painter.setPen(QPen(fontColor,2));
+                    painter.drawText(pos - 20, 20,  QString::number(i) + "Hz");
+                    painter.setPen(QPen(this->lineColor, 1));
+                    painter.drawLine(QPoint(pos, 0), QPoint(pos, height()));
+
+                    painter.setPen(this->graphBackgroundColor);
+                }
+
+               // double y = middle - 20.0 * log( (lsPy->at(i / binConst) +1) ) ;
+                double y = middle -   (lsPy->at(binPos)) * c ;
+
+                painter.setBrush(this->graphLineColor);
+                painter.drawEllipse(pos-1, y-1, 2, 2);
+
+
+                painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
+                pos+=zoom;
             }
-            if(i != 0 && i % 400 == 0) {
-                painter.setPen(QPen(fontColor,2));
-                painter.drawText(pos - 20, 20,  QString::number(i) + "Hz");
-                painter.setPen(QPen(this->lineColor, 1));
-                painter.drawLine(QPoint(pos, 0), QPoint(pos, height()));
-
-                painter.setPen(this->graphBackgroundColor);
-            }
-
-           // double y = middle - 20.0 * log( (lsPy->at(i / binConst) +1) ) ;
-            double y = middle -   (lsPy->at(binPos)) * c ;
-
-            painter.setBrush(this->graphLineColor);
-            painter.drawEllipse(pos-1, y-1, 2, 2);
-
-
-            painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
-            pos+=1;
         }
     }
     painter.end();
