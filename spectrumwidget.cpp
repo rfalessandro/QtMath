@@ -86,9 +86,9 @@ void SpectrumWidget::paintEvent(QPaintEvent *)
                 if(binPos >= lsPy->length()) {
                     break;
                 }
-                if( i == 1000 || i == 4000 || i == 9000 || i == 14000 || i == 18000 || i == 22000    ) {
+                if(i == 800 || i == 2000 || i == 4000 || i == 9000 || i == 14000 || i == 18000 || i == 22000    ) {
                     painter.setPen(QPen(fontColor,2));
-                    painter.drawText(pos - 20, 20,  QString::number(i) + "Hz");
+                    painter.drawText(pos - 20, 20,  QString::number(i).replace("000","K") + "Hz");
                     painter.setPen(QPen(this->lineColor, 1));
                     painter.drawLine(QPoint(pos, 0), QPoint(pos, height()));
 
