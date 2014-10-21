@@ -84,7 +84,7 @@ void AudioScene::createPoly(unsigned const char *buffer, unsigned int szBuffer, 
     }
     scene->clear();
     unsigned int i = 0,j = 0;
-    unsigned int MAX_VALUE = (1 << (bitDepth*8 )) ;
+    unsigned int MAX_VALUE = ( 1 << (bitDepth*8 - 1 )) ;
     double cs = (double)height()/MAX_VALUE;
     int desloc = graph->size();
 
