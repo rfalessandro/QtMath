@@ -64,7 +64,7 @@ void AudioScene::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
 
 
 void AudioScene::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel)
-{
+{    
     this->szSample += (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
     createPoly(buffer, szBuffer, bitDepth, nChannel, false);
 }
@@ -75,10 +75,8 @@ void AudioScene::createPoly(unsigned const char *buffer, unsigned int szBuffer, 
     if(graph == NULL) {
         graph = new QPolygon;
     }else {
-
         scene->removeItem(graphPoly);
         delete graphPoly;
-
         if(reset) {
             graph->clear();
         }
@@ -90,13 +88,17 @@ void AudioScene::createPoly(unsigned const char *buffer, unsigned int szBuffer, 
     double cs = (double)height()/MAX_VALUE;
     int desloc = graph->size();
 
-    graph->append(QPoint(0, 0));
+    if(reset) {
+        graph->append(QPoint(0, 0));
+    }else {
+        graph->pop_back();//remove point of zero line
+    }
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = -SoundUtil::getIntValue(buffer, j, bitDepth);
         graph->append(QPoint(desloc, value*cs));
         j += (nChannel * bitDepth);
         desloc++;
-    }
+    }    
     graph->append(QPoint(desloc, 0));
     graphPoly = new QGraphicsPolygonItem(*graph);
     graphPoly->setBrush(QBrush(graphBackgroundColor, Qt::SolidPattern));
@@ -244,7 +246,7 @@ void AudioScene::setGraphLineColor(const QColor &graphLineColor)
 void AudioScene::animate(unsigned int msec)
 {
     if(ball != NULL) {
-        qreal speed = ( this->szSample / (msec / TIMEROUT)) ;
+        qreal speed = ( this->szSample / (msec / TIMEROUT))  ;
         ball->setMovement( this->szSample, speed  );
     }
 }
@@ -280,9 +282,10 @@ void AudioScene::updateSceneRect()
 {
     int middle = rect().height()/2. + dy;
     setTransform(QTransform().scale(zoom, zoom));
+//    if(graphPoly != NULL) {
+//        graphPoly->setTransform(QTransform().scale(zoom, 1));
+//    }
     scene->setSceneRect(dx, -middle, width(), height());
-
-
 }
 
 

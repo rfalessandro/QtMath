@@ -151,7 +151,11 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="vlFrame"/>
+     <layout class="QVBoxLayout" name="vlFrame">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
+     </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -291,7 +295,11 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="vlFrame2"/>
+     <layout class="QVBoxLayout" name="vlFrame2">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -301,7 +309,7 @@
      <x>0</x>
      <y>0</y>
      <width>1089</width>
-     <height>26</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

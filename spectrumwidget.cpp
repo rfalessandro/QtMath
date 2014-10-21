@@ -6,6 +6,8 @@
 SpectrumWidget::SpectrumWidget(QWidget *parent) :
     GraphWidget(parent)
 {
+    this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    this->setMinimumSize(100,200);
     binConst = 44100.0/65536.0;
 }
 

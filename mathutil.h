@@ -43,12 +43,7 @@ public:
     static void divArray(cplx *buf, unsigned int n, const cplx value);
     static void multiArray(cplx *buf, unsigned int n, const cplx value);
 
-    static cplx getMaxMaginitude(const cplx *buff, unsigned int n);
-    static cplx getMinMaginitude(const cplx *buff, unsigned int n);
-    static double getMaxReal(const cplx *buff, unsigned int n);
-    static double getMinReal(const cplx *buff, unsigned int n);
-    static double getMaxImaginary(const cplx *buff, unsigned int n);
-    static double getMinImaginary(const cplx *buff, unsigned int n);
+
 
 
     static unsigned char *splitBuffer(unsigned const char *buffer, unsigned int posInit, unsigned int posEnd);

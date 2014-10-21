@@ -219,7 +219,12 @@ void MainWindow::soundStatus()
 
 
 void MainWindow::soundProgess(unsigned int value, double sec, const char *)
-{
+{    
+    if(sound->isCapture()) {
+        unsigned int newSz = value - szBuffer;
+        tela->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel);
+        szBuffer = value;
+    }
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }
 
@@ -353,6 +358,8 @@ void MainWindow::recordSound()
     sound->setTime(ui->sbSec->value() * 1000000);
     sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
     sound->setCaptureMode();
-
+    tela->setZoom( (double)tela->width()/(double)(sampleRate*ui->sbSec->value())  );
+    tela->setBuffer(NULL, 0, bitDepth, nChannel);
+    szBuffer = 0;
     threadSound->start();
 }

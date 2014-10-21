@@ -252,7 +252,6 @@ void Sound::run() {
         }  else if (rc != (int)frames) {
             str.sprintf("short write, write %d frames\n", rc);
         }
-    //    rc = write(1, bufferToPlay, size);
         it++;
         emit progress(desloc, (((double)peridTime) * (double)it)/1000000.0, str.toStdString().c_str());
     }
