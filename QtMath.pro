@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     graphwidget.cpp \
     spectrumwidget.cpp \
     soundspleet.cpp \
-    statisticutil.cpp
+    statisticutil.cpp \
+    wavewidget.cpp
 
 HEADERS  += mainwindow.h \
     sound.h \
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     graphwidget.h \
     spectrumwidget.h \
     soundspleet.h \
-    statisticutil.h
+    statisticutil.h \
+    wavewidget.h
 
 FORMS    += mainwindow.ui \
     rawinfodialog.ui \

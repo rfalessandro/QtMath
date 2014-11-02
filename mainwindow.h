@@ -7,6 +7,8 @@
 #include <QThread>
 #include "rawinfodialog.h"
 #include "spectrumwidget.h"
+#include "wavewidget.h"
+
 namespace Ui {
 class MainWindow;
 }
@@ -28,6 +30,7 @@ private:
     Ui::MainWindow *ui;
     AudioScene *tela;
     SpectrumWidget *spectrumWidget;
+    WaveWidget *waveWidget;
     QThread *threadSound;
     Sound *sound;
     unsigned char *buffer;

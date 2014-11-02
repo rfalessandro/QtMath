@@ -44,6 +44,15 @@ MainWindow::MainWindow(QWidget *parent) :
     spectrumWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x65));
 
 
+    waveWidget = new WaveWidget;
+    ui->vlFrame2->addWidget((QWidget *)waveWidget);
+    waveWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
+    waveWidget->setLineColor(QColor(0xDE, 0xDE, 0xDE, 0xFF) );
+    waveWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
+    waveWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xAE));
+    waveWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x65));
+
+
 
     connect(ui->btRecalc, SIGNAL(released()), this, SLOT(recalc()));
     connect(tela, SIGNAL(valueChanged()), this, SLOT(updateMain()));
@@ -312,12 +321,16 @@ void MainWindow::updateSoundInfo()
 
     spectrumWidget->setBuffer(buf, newSz, sampleRate);
 
+
+
+
     MathUtil::ifft(buf, newSz);
 
-    buffer = SoundUtil::toBuffer( buf,   &newSz,sampleRate, nChannel, bitDepth);
-    szBuffer = newSz;
+    buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
+   // szBuffer = newSz;
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
+    waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
 
     tela->repaint();
 
