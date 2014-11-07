@@ -34,16 +34,18 @@ void WaveWidget::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, 
 
 void WaveWidget::createPoly(const unsigned char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, bool reset)
 {
-    clear();
+    if(reset) {
+        clear();
+    }
     unsigned int MAX_VALUE = ( 1 << (bitDepth*8 - 1 )) ;
-    double cs = (double)height()/MAX_VALUE;
+    yMax = MAX_VALUE;
     unsigned int i,j,desloc;
     j=0;
     desloc=0;
     for( i = 0; j < szBuffer ; i ++ ) {
         int value = -SoundUtil::getIntValue(buffer, j, bitDepth);
         //graph->append(QPoint(desloc, value*cs));
-        this->pushPy(value*cs);
+        this->pushPy(value);
         j += (nChannel * bitDepth);
         desloc++;
     }
@@ -56,7 +58,6 @@ void WaveWidget::paintEvent(QPaintEvent *)
     QPainter painter;
 
     xMax = 22050;
-    yMax = 100;
     deltaX = 1;
     deltaY = 1;
 
@@ -77,22 +78,24 @@ void WaveWidget::paintEvent(QPaintEvent *)
 
 
     if(lsPy != NULL) {
-        int maxY = 0;
-        for (int i = 0 ; i < lsPy->length() ; i++) {
-            int y = lsPy->at(i);
-            if(y > maxY) {
-                maxY = y;
-            }
-        }
-        double c =  (double)height() / (double)maxY  ;
+//        int maxY = 0;
+//        for (int i = 0 ; i < lsPy->length() ; i++) {
+//            int y = lsPy->at(i);
+//            if(y > maxY) {
+//                maxY = y;
+//            }
+//        }
+
+
+        double c =  (double)height() / (double)yMax  ;
         double pos = 0;
         dx = std::min(dx, lsPy->length());
 
-        painter.setPen(this->graphBackgroundColor);
-          double desloc = 1.0/zoom;
+        painter.setBrush(this->graphBackgroundColor);
+        double desloc = std::max(1.0 , 1.0/zoom);
         if(lsPy->length() > 0) {
 
-            for (int i = dx ; i + desloc< lsPy->length() && pos < width() ; i+=desloc) {
+            for (int i = dx ; i + desloc< lsPy->length() && pos < width() ; i += desloc) {
 
 
                 double maxY = 0, y = 0;
@@ -108,18 +111,17 @@ void WaveWidget::paintEvent(QPaintEvent *)
                 if(maxY < 0 ){
                     acc = -acc;
                 }
-                y = middle - maxY*c;
-                acc = middle - acc*c;
+                y = middle + maxY*c;
+                acc = middle + acc*c;
 
-                painter.setBrush(this->graphLineColor);
-
-                painter.drawEllipse(pos-1, y-1, 2, 2);
 
                 painter.setPen(this->graphBackgroundColor);
+                painter.drawEllipse(pos-1, y-1, 2, 2);
+
                 painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
 
                 if(desloc>1) {
-                    painter.setPen(QColor(0x90,0x54,0x34));
+                    painter.setPen(this->graphLineColor);
                     painter.drawLine(QPoint(pos, middle), QPoint(pos, acc ));
                 }
 

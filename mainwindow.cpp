@@ -49,8 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
     waveWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     waveWidget->setLineColor(QColor(0xDE, 0xDE, 0xDE, 0xFF) );
     waveWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
-    waveWidget->setGraphLineColor(QColor(0xFF, 0x8A, 0x05, 0xAE));
-    waveWidget->setGraphBackgroundColor(QColor(0xFF, 0x8A, 0x05, 0x65));
+    waveWidget->setGraphLineColor(QColor(0x2D, 0x67, 0x99, 0x50));
+    waveWidget->setGraphBackgroundColor(QColor(0x2D, 0x67, 0x99, 0x24));
 
 
 
@@ -326,7 +326,7 @@ void MainWindow::updateSoundInfo()
 
     MathUtil::ifft(buf, newSz);
 
-    buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
+    //buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
    // szBuffer = newSz;
 
     tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
