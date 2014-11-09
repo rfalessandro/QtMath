@@ -11,6 +11,7 @@ protected:
     void updateGraph();
     void paintEvent(QPaintEvent *);
     int szSample;
+    double zoomConst;
     void createPoly(unsigned const char *buffer, unsigned int szBuffer,  int bitDepth, int nChannel, bool reset);
 public:
     explicit WaveWidget(QWidget *parent = 0);

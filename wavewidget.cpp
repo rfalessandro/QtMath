@@ -2,6 +2,8 @@
 #include "spectrumwidget.h"
 #include <QPainter>
 #include <math.h>
+
+#include <stdio.h>
 #include <soundutil.h>
 
 WaveWidget::WaveWidget(QWidget *parent) :
@@ -19,7 +21,7 @@ void WaveWidget::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
 {
     this->szSample = (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
     int sec = (int)(0.5 + ((double)(szBuffer / (nChannel * bitDepth))  / (double)sampleRate ));
-    zoom = ((double)width()/(double)(sampleRate*sec));
+    zoomConst = ((double)width()/(double)(sampleRate*sec));
     createPoly(buffer, szBuffer, bitDepth, nChannel, true);
 
 }
@@ -92,7 +94,7 @@ void WaveWidget::paintEvent(QPaintEvent *)
         dx = std::min(dx, lsPy->length());
 
         painter.setBrush(this->graphBackgroundColor);
-        double desloc = std::max(1.0 , 1.0/zoom);
+        double desloc = std::max(1.0 , 1.0/(zoom*zoom*zoomConst));
         if(lsPy->length() > 0) {
 
             for (int i = dx ; i + desloc< lsPy->length() && pos < width() ; i += desloc) {
@@ -108,21 +110,32 @@ void WaveWidget::paintEvent(QPaintEvent *)
                     acc += y*y;
                 }
                 acc = sqrt(acc/desloc);
-                if(maxY < 0 ){
-                    acc = -acc;
-                }
-                y = middle + maxY*c;
-                acc = middle + acc*c;
+
+
+                maxY = maxY*c;//calc here for performace
+
+                y = middle + maxY;
+
 
 
                 painter.setPen(this->graphBackgroundColor);
                 painter.drawEllipse(pos-1, y-1, 2, 2);
 
-                painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
 
-                if(desloc>1) {
+
+                if(desloc>5) {
+                    acc = acc*c;//calc here for performace
+                    double y2 = middle - maxY;
+                    double acc2 = middle - acc;
+                    acc = middle + acc;
+
+                    painter.drawLine(QPoint(pos, y2), QPoint(pos, y ));
                     painter.setPen(this->graphLineColor);
-                    painter.drawLine(QPoint(pos, middle), QPoint(pos, acc ));
+                    painter.drawLine(QPoint(pos, acc2), QPoint(pos, acc ));
+                    printf("\n%f", (float)desloc);
+                }else {
+                   painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
+                   printf("\n=FIM=%f", (float)desloc);
                 }
 
 
