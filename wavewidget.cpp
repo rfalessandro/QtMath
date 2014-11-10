@@ -123,7 +123,7 @@ void WaveWidget::paintEvent(QPaintEvent *)
 
 
 
-                if(desloc>5) {
+                if(desloc>10) {
                     acc = acc*c;//calc here for performace
                     double y2 = middle - maxY;
                     double acc2 = middle - acc;
@@ -132,10 +132,8 @@ void WaveWidget::paintEvent(QPaintEvent *)
                     painter.drawLine(QPoint(pos, y2), QPoint(pos, y ));
                     painter.setPen(this->graphLineColor);
                     painter.drawLine(QPoint(pos, acc2), QPoint(pos, acc ));
-                    printf("\n%f", (float)desloc);
                 }else {
                    painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
-                   printf("\n=FIM=%f", (float)desloc);
                 }
 
 

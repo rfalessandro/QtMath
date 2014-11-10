@@ -20,19 +20,16 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle("QtMath");
-    tela = new AudioScene;
-
-    ui->vlFrame->addWidget((QWidget *)this->tela);
-
 
     ui->btRecord->setDisabled(true);
-
-    tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
-    tela->setLineColor(QColor(0xF4, 0xAC, 0x50, 0x70));
-    tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));    
-    //tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
-    tela->setGraphLineColor(QColor(0x2D, 0x67, 0x69));
-    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 0x68));
+//tela = new AudioScene;
+//    ui->vlFrame->addWidget((QWidget *)this->tela);
+//    tela->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
+//    tela->setLineColor(QColor(0xF4, 0xAC, 0x50, 0x70));
+//    tela->setPointColor(QColor(0x14, 0xe1, 0x2c, 0x99));
+//    //tela->setGraphLineColor(QColor(0x67, 0x95, 0x94, 90));
+//    tela->setGraphLineColor(QColor(0x2D, 0x67, 0x69));
+//    tela->setGraphBackgroundColor(QColor(0xD5, 0xEB, 0xE7, 0x68));
 
 
     spectrumWidget = new SpectrumWidget;
@@ -45,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     waveWidget = new WaveWidget;
-    ui->vlFrame2->addWidget((QWidget *)waveWidget);
+    ui->vlFrame->addWidget((QWidget *)waveWidget);
     waveWidget->setBackgroundColor(QColor(0xF0, 0xF7, 0xF2));
     waveWidget->setLineColor(QColor(0xDE, 0xDE, 0xDE, 0xFF) );
     waveWidget->setFontColor(QColor(0x68, 0x68, 0x68, 0xFF) );
@@ -55,7 +52,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     connect(ui->btRecalc, SIGNAL(released()), this, SLOT(recalc()));
-    connect(tela, SIGNAL(valueChanged()), this, SLOT(updateMain()));
+    //connect(tela, SIGNAL(valueChanged()), this, SLOT(updateMain()));
+    connect(waveWidget, SIGNAL(valueChanged()), this, SLOT(updateMain()));
     connect(ui->btPlay, SIGNAL(released()), this, SLOT(playSound()));
     connect(ui->btRecord, SIGNAL(released()), this, SLOT(recordSound()));
     connect(ui->sbDx, SIGNAL(valueChanged(int)), this, SLOT(updateFrame()));
@@ -117,30 +115,42 @@ MainWindow::~MainWindow()
     threadSound->exit();
     delete threadSound;
     delete sound;
-    delete tela;
+    //delete tela;
+    delete waveWidget;
+    delete spectrumWidget;
     delete ui;
 }
 
 void MainWindow::updateMain()
 {
-    ui->sbDx->setValue( tela->getDx() ) ;
-    ui->sbDy->setValue( tela->getDy() );
-    ui->sbZoom->setValue(tela->getZoom() );
+//    ui->sbDx->setValue( tela->getDx() ) ;
+//    ui->sbDy->setValue( tela->getDy() );
+//    ui->sbZoom->setValue(tela->getZoom() );
+    ui->sbDx->setValue( waveWidget->getDx() ) ;
+    ui->sbDy->setValue( waveWidget->getDy() );
+    ui->sbZoom->setValue(waveWidget->getZoom() );
 }
 
 void MainWindow::recalc() {
-    tela->setDx(ui->sbDx->value());
-    tela->setDy(ui->sbDy->value());
-    tela->setZoom(ui->sbZoom->value());
-    tela->repaint();
+//    tela->setDx(ui->sbDx->value());
+//    tela->setDy(ui->sbDy->value());
+//    tela->setZoom(ui->sbZoom->value());
+//    tela->repaint();
+    waveWidget->setDx(ui->sbDx->value());
+    waveWidget->setDy(ui->sbDy->value());
+    waveWidget->setZoom(ui->sbZoom->value());
 
 }
 
 void MainWindow::updateFrame()
 {
-    tela->setDx(ui->sbDx->value());
-    tela->setDy(ui->sbDy->value());
-    tela->setZoom(ui->sbZoom->value());
+//    tela->setDx(ui->sbDx->value());
+//    tela->setDy(ui->sbDy->value());
+//    tela->setZoom(ui->sbZoom->value());
+    waveWidget->setDx(ui->sbDx->value());
+    waveWidget->setDy(ui->sbDy->value());
+    waveWidget->setZoom(ui->sbZoom->value());
+
 }
 
 void MainWindow::makeGraph()
@@ -167,7 +177,7 @@ void MainWindow::playSound()
 {
     if(sound->isPlaying()) {
         sound->stop();
-        tela->stopAnimate();
+        //tela->stopAnimate();
     }else {
         if(szBuffer > 0) {
             threadSound->quit();
@@ -179,10 +189,14 @@ void MainWindow::playSound()
             sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
             sound->setPlayMode();
 
-            tela->setDx(0);
-            tela->setDy(0);
-            tela->setPointPos(0,0);
-            tela->animate(ui->sbSec->value() * 1000);
+//            tela->setDx(0);
+//            tela->setDy(0);
+//            tela->setPointPos(0,0);
+//            tela->animate(ui->sbSec->value() * 1000);
+
+            waveWidget->setDx(0);
+            waveWidget->setDy(0);
+
 
 
             threadSound->start();
@@ -202,7 +216,7 @@ void MainWindow::soundError(int errorType, const QString &errorStr)
     switch (errorType) {
         case Sound::ERROR_OPEN_DEVICE:
         case Sound::ERROR_PARAMS_DEVICE:
-            tela->stopAnimate();
+            //tela->stopAnimate();
             messageBox.critical(this,"Error", errorStr);
             break;
         default:
@@ -231,7 +245,8 @@ void MainWindow::soundProgess(unsigned int value, double sec, const char *)
 {    
     if(sound->isCapture()) {
         unsigned int newSz = value - szBuffer;
-        tela->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel);
+        //tela->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel);
+        waveWidget->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel, sampleRate);
         szBuffer = value;
     }
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
@@ -327,12 +342,13 @@ void MainWindow::updateSoundInfo()
     MathUtil::ifft(buf, newSz);
 
     //buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
-   // szBuffer = newSz;
+    //szBuffer = newSz;
 
-    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
+//    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
     waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
 
-    tela->repaint();
+
+  //  tela->repaint();
 
 
 }
@@ -371,8 +387,10 @@ void MainWindow::recordSound()
     sound->setTime(ui->sbSec->value() * 1000000);
     sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
     sound->setCaptureMode();
-    tela->setZoom( (double)tela->width()/(double)(sampleRate*ui->sbSec->value())  );
-    tela->setBuffer(NULL, 0, bitDepth, nChannel);
+    //tela->setZoom( (double)tela->width()/(double)(sampleRate*ui->sbSec->value())  );
+    //tela->setBuffer(NULL, 0, bitDepth, nChannel);
+    waveWidget->setBuffer(NULL, 0, bitDepth, nChannel, sampleRate);
+
     szBuffer = 0;
     threadSound->start();
 }

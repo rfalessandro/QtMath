@@ -28,7 +28,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    AudioScene *tela;
+//    AudioScene *tela;
     SpectrumWidget *spectrumWidget;
     WaveWidget *waveWidget;
     QThread *threadSound;
