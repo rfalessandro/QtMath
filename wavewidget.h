@@ -16,8 +16,8 @@ protected:
     void createPoly(unsigned const char *buffer, unsigned int szBuffer,  int bitDepth, int nChannel, bool reset);
 public:
     explicit WaveWidget(QWidget *parent = 0);
-    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate);
-    void pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate);
+    void setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate, double time);
+    void pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate, double time);
 
 signals:
 

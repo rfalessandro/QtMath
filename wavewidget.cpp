@@ -17,19 +17,23 @@ WaveWidget::WaveWidget(QWidget *parent) :
 }
 
 
-void WaveWidget::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate)
+void WaveWidget::setBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate, double time)
 {
-    this->szSample = (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
-    int sec = (int)(0.5 + ((double)(szBuffer / (nChannel * bitDepth))  / (double)sampleRate ));
-    zoomConst = ((double)width()/(double)(sampleRate*sec));
+
+    zoomConst = ((double)width()/(double)(sampleRate*time));
     createPoly(buffer, szBuffer, bitDepth, nChannel, true);
 
 }
 
 
-void WaveWidget::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate)
+void WaveWidget::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate,  double time)
 {
-    this->szSample += (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
+//    this->szSample += (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
+    //int sec = (int)(0.5 + ((double)(szBuffer / (nChannel * bitDepth))  / (double)sampleRate ));
+    zoomConst = ((double)width()/(double)(sampleRate*time));
+    //zoomConst = 0.;
+
+
     createPoly(buffer, szBuffer, bitDepth, nChannel, false);
 }
 
@@ -56,47 +60,27 @@ void WaveWidget::createPoly(const unsigned char *buffer, unsigned int szBuffer, 
 
 void WaveWidget::resizeEvent(QResizeEvent *e)
 {
-    this->QWidget::resizeEvent(e);
-
-    //zoomConst = ((double)width()/(double)(sampleRate*sec));
-
-   zoomConst = zoomConst * (  e->size().width() / e->oldSize().width());
+   this->QWidget::resizeEvent(e);
+   zoomConst = (zoomConst *  (double)e->size().width()) / (double)e->oldSize().width();
 }
 
 void WaveWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter;
 
-    xMax = 22050;
-    deltaX = 1;
-    deltaY = 1;
-
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
     int middle = rect().height()/2;
 
-
-
     painter.setBrush(this->backgroundColor);
-
     painter.drawRect(0,0,width(),height());
     painter.drawLine(QPoint(0,middle), QPoint(width(),middle));
-
     painter.setPen(QPen(graphLineColor,1));
 
 
 
     if(lsPy != NULL) {
-//        int maxY = 0;
-//        for (int i = 0 ; i < lsPy->length() ; i++) {
-//            int y = lsPy->at(i);
-//            if(y > maxY) {
-//                maxY = y;
-//            }
-//        }
-
-
         double c =  (double)height() / (double)yMax  ;
         double pos = 0;
         dx = std::min(dx, lsPy->length());

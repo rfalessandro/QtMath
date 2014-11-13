@@ -227,7 +227,7 @@ void Sound::run() {
             memcpy(bufferToPlay, buffer+desloc, size);
             desloc += size;
             if(desloc >= szBuffer ) {
-                desloc = 0;//circular
+               break;
             }
             rc = snd_pcm_writei(handle, bufferToPlay, frames);
         }else {

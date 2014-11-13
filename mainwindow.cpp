@@ -246,9 +246,9 @@ void MainWindow::soundProgess(unsigned int value, double sec, const char *)
     if(sound->isCapture()) {
         unsigned int newSz = value - szBuffer;
         //tela->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel);
-        waveWidget->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel, sampleRate);
+        waveWidget->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel, sampleRate, (double)ui->sbSec->value());
         szBuffer = value;
-    }
+     }
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
 }
 
@@ -345,11 +345,11 @@ void MainWindow::updateSoundInfo()
     //szBuffer = newSz;
 
 //    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
-    waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate);
+    if(!sound->isCapture()) {
+        waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate,(double)ui->sbSec->value());
+    }
 
-
-  //  tela->repaint();
-
+    sound->setPlayMode();
 
 }
 
@@ -378,6 +378,7 @@ void MainWindow::recordSound()
     if(buffer == NULL) {
         free(buffer);
     }
+
     buffer = (unsigned char *)calloc(sizeof(unsigned char), szBuffer);
     threadSound->quit();
     sound->setBuffer(buffer, szBuffer);
@@ -389,7 +390,8 @@ void MainWindow::recordSound()
     sound->setCaptureMode();
     //tela->setZoom( (double)tela->width()/(double)(sampleRate*ui->sbSec->value())  );
     //tela->setBuffer(NULL, 0, bitDepth, nChannel);
-    waveWidget->setBuffer(NULL, 0, bitDepth, nChannel, sampleRate);
+    waveWidget->setZoom(1);
+    waveWidget->setBuffer(NULL, 0, bitDepth, nChannel, sampleRate, (double)ui->sbSec->value());
 
     szBuffer = 0;
     threadSound->start();
