@@ -8,6 +8,7 @@ class WaveWidget : public GraphWidget
 {
     Q_OBJECT
 protected:
+    void resizeEvent(QResizeEvent *);
     void updateGraph();
     void paintEvent(QPaintEvent *);
     int szSample;
