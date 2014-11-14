@@ -35,6 +35,7 @@ private:
     Sound *sound;
     unsigned char *buffer;
     unsigned int szBuffer;
+    unsigned int szBufferAux;
     int sampleRate;
     int nChannel;
     int bitDepth;

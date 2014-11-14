@@ -163,8 +163,7 @@ void MainWindow::makeGraph()
     this->bitDepth = graphDlg->getBitDepth();
     this->nChannel = graphDlg->getNChannel();
     this->sampleRate = graphDlg->getSampleRate();
-    this->szBuffer = sampleRate * bitDepth * nChannel;
-
+    this->szBufferAux = sampleRate * bitDepth * nChannel;
 
     updateSoundInfo();
 
@@ -175,6 +174,7 @@ void MainWindow::makeGraph()
 
 void MainWindow::playSound()
 {
+    this->szBufferAux = 0;
     if(sound->isPlaying()) {
         sound->stop();
         //tela->stopAnimate();
@@ -189,15 +189,8 @@ void MainWindow::playSound()
             sound->setDeviceName(ui->cbDevice->currentData().toString().toStdString().c_str());
             sound->setPlayMode();
 
-//            tela->setDx(0);
-//            tela->setDy(0);
-//            tela->setPointPos(0,0);
-//            tela->animate(ui->sbSec->value() * 1000);
-
             waveWidget->setDx(0);
             waveWidget->setDy(0);
-
-
 
             threadSound->start();
         }else {
@@ -243,13 +236,18 @@ void MainWindow::soundStatus()
 
 void MainWindow::soundProgess(unsigned int value, double sec, const char *)
 {    
+    unsigned int newSz = value - szBufferAux;
     if(sound->isCapture()) {
-        unsigned int newSz = value - szBuffer;
-        //tela->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel);
-        waveWidget->pushBuffer(buffer+szBuffer, newSz, bitDepth, nChannel, sampleRate, (double)ui->sbSec->value());
-        szBuffer = value;
-     }
+        waveWidget->pushBuffer(buffer+szBufferAux, newSz, bitDepth, nChannel, sampleRate, (double)ui->sbSec->value());
+    }
+
+//    newSz = value/(nChannel * bitDepth);
+//    cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer+szBufferAux, &newSz, nChannel, bitDepth, 0), newSz);
+//    spectrumWidget->setBuffer(buf, newSz, sampleRate);
+
+    waveWidget->setDx(   value/(bitDepth * nChannel) - waveWidget->width()  / 2);
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
+    szBufferAux = value;
 }
 
 void MainWindow::openMakeGraph()
@@ -288,14 +286,15 @@ void MainWindow::acceptRawInfo()
     if(buffer != NULL) {
         free(buffer);
     }
-    szBuffer = file.size();
-    buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBuffer);
-    file.read((char *)buffer, szBuffer);
+    szBufferAux = file.size();
+    buffer = (unsigned char *) calloc ( sizeof(unsigned char) , szBufferAux);
+    file.read((char *)buffer, szBufferAux);
 
 
     this->bitDepth = rawInfoDlg->getBitDepth();
     this->sampleRate = rawInfoDlg->getSampleRate();
     this->nChannel = rawInfoDlg->getNChannel();
+    ui->sbSec->setValue( szBufferAux/(this->bitDepth * this->nChannel * this->sampleRate));
     updateSoundInfo();
 
 
@@ -321,6 +320,7 @@ void MainWindow::save()
 
 void MainWindow::updateSoundInfo()
 {
+    szBuffer = szBufferAux;
     ui->sbNChannel->setValue(this->nChannel);
     ui->cbFormat->setCurrentIndex(ui->cbFormat->findData(this->bitDepth));
 
@@ -330,25 +330,17 @@ void MainWindow::updateSoundInfo()
     spleet.split(buffer, szBuffer, nChannel, bitDepth);
 
 
-
-    unsigned int newSz = sampleRate;
-    cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
-
-    spectrumWidget->setBuffer(buf, newSz, sampleRate);
-
-
-
-
-    MathUtil::ifft(buf, newSz);
-
-    //buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
-    //szBuffer = newSz;
-
-//    tela->setBuffer(buffer, szBuffer, bitDepth, nChannel);
     if(!sound->isCapture()) {
         waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate,(double)ui->sbSec->value());
-    }
 
+        unsigned int newSz = 44100;
+        cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
+        spectrumWidget->setBuffer(buf, newSz, sampleRate);
+        MathUtil::ifft(buf, newSz);
+
+    }
+    //unsigned char *buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
+    //szBuffer = newSz;
     sound->setPlayMode();
 
 }
@@ -370,6 +362,7 @@ void MainWindow::changeDevice()
 
 void MainWindow::recordSound()
 {
+    this->szBufferAux = 0;
     this->sampleRate = 44100;
     this->nChannel = ui->sbNChannel->value();
     this->bitDepth = ui->cbFormat->currentData().toInt();

@@ -13,7 +13,6 @@ WaveWidget::WaveWidget(QWidget *parent) :
     this->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     this->setMinimumSize(100,200);
 
-
 }
 
 
@@ -28,12 +27,7 @@ void WaveWidget::setBuffer(unsigned const char *buffer, unsigned int szBuffer, i
 
 void WaveWidget::pushBuffer(unsigned const char *buffer, unsigned int szBuffer, int bitDepth, int nChannel, int sampleRate,  double time)
 {
-//    this->szSample += (int)(0.5 + (szBuffer / (nChannel * bitDepth)));
-    //int sec = (int)(0.5 + ((double)(szBuffer / (nChannel * bitDepth))  / (double)sampleRate ));
     zoomConst = ((double)width()/(double)(sampleRate*time));
-    //zoomConst = 0.;
-
-
     createPoly(buffer, szBuffer, bitDepth, nChannel, false);
 }
 
@@ -130,6 +124,8 @@ void WaveWidget::paintEvent(QPaintEvent *)
                 }
             }else {
                 desloc = 1/desloc;
+                double lastY=0;
+                double lastX=0;
                 for (int i = dx ; i + desloc< lsPy->length() && pos < width() ; i ++) {
                     double maxY = 0, y = 0;
 
@@ -137,10 +133,16 @@ void WaveWidget::paintEvent(QPaintEvent *)
 
                     y = middle + maxY;
                     painter.setPen(this->graphBackgroundColor);
-                    painter.drawEllipse(pos-1, y-1, 2, 2);
-
+                    painter.drawEllipse(pos-1, y-1, 2, 2);                    
                     painter.drawLine(QPoint(pos, middle), QPoint(pos, y ));
+
+                    painter.setPen(this->graphLineColor);
+                    painter.drawLine(QPoint(lastX, lastY), QPoint(pos, y));
+
+                    lastY = y;
+                    lastX = pos;
                     pos+=desloc;
+
                 }
             }
         }
