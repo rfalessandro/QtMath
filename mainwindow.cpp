@@ -329,16 +329,22 @@ void MainWindow::updateSoundInfo()
     SoundSpleet spleet;
     spleet.split(buffer, szBuffer, nChannel, bitDepth);
 
-
+unsigned int newSz = 44100;
     if(!sound->isCapture()) {
         waveWidget->setBuffer(buffer, szBuffer, bitDepth, nChannel, sampleRate,(double)ui->sbSec->value());
 
-        unsigned int newSz = 44100;
+
         cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
         spectrumWidget->setBuffer(buf, newSz, sampleRate);
         MathUtil::ifft(buf, newSz);
 
+    }else {
+
+        cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer, &newSz, nChannel, bitDepth, 0), sampleRate);
+        spectrumWidget->setBuffer(buf, newSz, sampleRate);
+
     }
+
     //unsigned char *buffer = SoundUtil::toBuffer( buf,   &newSz, sampleRate, nChannel, bitDepth);
     //szBuffer = newSz;
     sound->setPlayMode();
