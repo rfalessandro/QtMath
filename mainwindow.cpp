@@ -245,7 +245,7 @@ void MainWindow::soundProgess(unsigned int value, double sec, const char *)
 //    cplx *buf = MathUtil::fft(SoundUtil::toComplex(buffer+szBufferAux, &newSz, nChannel, bitDepth, 0), newSz);
 //    spectrumWidget->setBuffer(buf, newSz, sampleRate);
 
-    waveWidget->setDx(   value/(bitDepth * nChannel) - waveWidget->width()  / 2);
+//    waveWidget->setDx(   value/(bitDepth * nChannel) - waveWidget->width()  / 2);
     ui->lbSecs->setText(  QString::number( sec , 'g', 3) + "s");
     szBufferAux = value;
 }
